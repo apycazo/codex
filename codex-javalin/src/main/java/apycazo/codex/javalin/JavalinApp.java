@@ -1,6 +1,5 @@
 package apycazo.codex.javalin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.core.JavalinConfig;
@@ -22,26 +21,22 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 @Slf4j
 public class JavalinApp {
 
-  public static final ObjectMapper mapper = new ObjectMapper();
-
   public static void main(String[] args) {
-    Javalin
+    init().start(8080);
+  }
+
+  public static Javalin init() {
+    return Javalin
       .create(JavalinApp::config)
       .exception(Exception.class, exceptionHandler())
-      .routes(routes())
-      .start(8080);
+      .routes(routes());
   }
 
   @NotNull
   private static ExceptionHandler<Exception> exceptionHandler() {
     return (e, ctx) -> {
       ResultData data = ResultData.builder().data(e.getMessage()).build();
-      try {
-        String payload = mapper.writeValueAsString(data);
-        ctx.result(payload);
-      } catch (Exception ex) {
-        log.error("Server error", ex);
-      }
+      ctx.json(data);
       ctx.status(400);
     };
   }

@@ -1,6 +1,17 @@
 dependencies {
+  // dependency management
   implementation platform(project(":codex-platform"))
-  implementation "io.javalin:javalin"
-  implementation "com.fasterxml.jackson.core:jackson-databind"
-  implementation "org.slf4j:slf4j-api", "org.slf4j:slf4j-simple"
+  implementation ( // application dependencies
+    "io.javalin:javalin",
+    "com.fasterxml.jackson.core:jackson-databind",
+    "org.slf4j:slf4j-api",
+    "org.slf4j:slf4j-simple")
+  testImplementation ( // test-only dependencies
+    "org.junit.jupiter:junit-jupiter-api",
+    "org.junit.jupiter:junit-jupiter-engine",
+    "io.rest-assured:rest-assured")
+}
+
+test {
+  useJUnitPlatform()
 }
