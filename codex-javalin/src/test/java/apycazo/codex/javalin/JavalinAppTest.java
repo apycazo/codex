@@ -6,7 +6,10 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -63,5 +66,17 @@ class JavalinAppTest {
       .statusCode(200)
       .contentType(ContentType.JSON)
       .body("data", equalTo("dana"));
+  }
+
+  @ParameterizedTest
+  @CsvSource({"0, john", "1, dana", "2, fox"})
+  void all_ids_are_present(int id, String expectedValue) {
+    given()
+      .pathParam("id", id)
+      .when()
+      .get("users/{id}").then()
+      .statusCode(200)
+      .contentType(ContentType.JSON)
+      .body("data", equalTo(expectedValue));
   }
 }
