@@ -1,0 +1,6 @@
+rootProject.name = 'codex'
+include 'codex-platform'
+include 'codex-java'
+include 'codex-micronaut'
+include 'codex-javalin'
+

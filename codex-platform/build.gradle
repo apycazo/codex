@@ -1,0 +1,68 @@
+plugins {
+  id "java-platform"
+  id "maven-publish"
+}
+
+publishing {
+  publications {
+    codexPlatform(MavenPublication) {
+      from components.javaPlatform
+    }
+  }
+}
+
+dependencies {
+  constraints {
+    api( // --- java
+      "javax.annotation:javax.annotation-api:$annotationApi"
+    )
+    api( // --- loggers
+      "org.slf4j:slf4j-api:$slf4jVersion",
+      "org.slf4j:slf4j-simple:$slf4jVersion",
+      "org.apache.logging.log4j:log4j-core:$log4j2Version",
+      "org.apache.logging.log4j:log4j-api:$log4j2Version",
+      "org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version",
+      "org.slf4j:slf4j-api:$slf4jVersion",
+      "ch.qos.logback:logback-core:$logbackVersion",
+      "ch.qos.logback:logback-classic:$logbackVersion"
+    )
+    api( // --- parsers
+      "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+      "org.yaml:snakeyaml:$snakeYamlVersion"
+    )
+    api( // --- spring
+      "org.springframework:spring-context:$springVersion",
+      "org.springframework:spring-core:$springVersion",
+      "org.springframework:spring-test:$springVersion",
+      "org.springframework:spring-web:$springVersion",
+      "org.springframework:spring-tx:$springVersion"
+    )
+    api( // --- jersey
+      "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion",
+      "org.glassfish.jersey.media:jersey-media-json-jackson:$jerseyVersion",
+      "org.glassfish.jersey.ext:jersey-spring4:$jerseyVersion",
+      "org.glassfish.jersey.ext:jersey-spring5:$jerseyVersion",
+      "org.glassfish.jersey.ext:jersey-bean-validation:$jerseyVersion",
+      "javax.servlet:javax.servlet-api:$servletApiVersion",
+      "javax.xml.bind:jaxb-api:$jaxbApiVersion"
+    )
+    api( // --- jetty
+      "org.eclipse.jetty:jetty-server:$jettyVersion",
+      "org.eclipse.jetty:jetty-servlet:$jettyVersion",
+      "org.eclipse.jetty:jetty-config:$jettyVersion",
+      "javax.xml.bind:jaxb-api:$jaxbApiVersion"
+    )
+    api ( // --- frameworks
+      "io.javalin:javalin:$javalin"
+    )
+    api( // --- test frameworks
+      "org.junit.jupiter:junit-jupiter-api:$junitVersion",
+      "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
+      "org.assertj:assertj-core:$assertjVersion",
+      "io.cucumber:cucumber-java:$cucumberVersion",
+      "io.cucumber:cucumber-junit:$cucumberVersion",
+      "io.cucumber:cucumber-spring:$cucumberVersion",
+      "io.rest-assured:rest-assured:$restAssuredVersion"
+    )
+  }
+}

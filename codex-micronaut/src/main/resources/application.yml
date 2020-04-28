@@ -1,0 +1,18 @@
+micronaut:
+  application.name: micronaut-rest
+  server.port: 8181
+
+endpoints:
+  info:
+    enabled: true
+    sensitive: false
+
+info:
+  application:
+    name: ${micronaut.application.name:unknown}
+    version: ${app.version:unknown}
+    type: snapshot
+
+app:
+  author: andres picazo
+  version: 1.0

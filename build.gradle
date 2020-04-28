@@ -1,0 +1,53 @@
+plugins {
+  id "io.franzbecker.gradle-lombok" version "3.3.0" apply false
+}
+
+wrapper {
+  distributionType = Wrapper.DistributionType.ALL
+  version = "6.3"
+}
+
+subprojects {
+  // --- repositories
+  repositories {
+    mavenCentral()
+  }
+  // --- configure projects
+  def ignoredProjects = ["codex-platform"]
+  if (!ignoredProjects.contains(project.name)) {
+    apply plugin: "java"
+    apply plugin: "io.franzbecker.gradle-lombok"
+    dependencies {
+      implementation platform(project(":codex-platform"))
+    }
+  }
+}
+
+// starters
+ext {
+  testing = [
+    "org.junit.jupiter:junit-jupiter-api",
+    "org.junit.jupiter:junit-jupiter-engine",
+    "org.assertj:assertj-core",
+    "io.cucumber:cucumber-java",
+    "io.cucumber:cucumber-junit",
+    "io.cucumber:cucumber-spring",
+    "io.rest-assured:rest-assured"
+  ]
+
+  logback = [
+    "org.slf4j:slf4j-api",
+    "ch.qos.logback:logback-core"
+  ]
+
+  springBasic = [
+    "org.springframework:spring-context",
+    "org.springframework:spring-test"
+  ]
+
+  jackson = [
+    "com.fasterxml.jackson.core:jackson-databind"
+  ]
+
+  springStarter = testing + logback + jackson + springBasic + ["javax.annotation:javax.annotation-api"]
+}

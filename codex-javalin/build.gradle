@@ -1,0 +1,6 @@
+dependencies {
+  implementation platform(project(":codex-platform"))
+  implementation "io.javalin:javalin"
+  implementation "com.fasterxml.jackson.core:jackson-databind"
+  implementation "org.slf4j:slf4j-api", "org.slf4j:slf4j-simple"
+}
