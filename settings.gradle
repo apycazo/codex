@@ -3,4 +3,5 @@ include 'codex-platform'
 include 'codex-java'
 include 'codex-micronaut'
 include 'codex-javalin'
+include 'codex-jersey'
 

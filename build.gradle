@@ -37,7 +37,8 @@ ext {
 
   logback = [
     "org.slf4j:slf4j-api",
-    "ch.qos.logback:logback-core"
+    "ch.qos.logback:logback-core",
+    "ch.qos.logback:logback-classic"
   ]
 
   springBasic = [

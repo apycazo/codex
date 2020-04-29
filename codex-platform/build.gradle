@@ -38,8 +38,12 @@ dependencies {
       "org.springframework:spring-tx:$springVersion"
     )
     api( // --- jersey
+      "org.glassfish.jersey.bundles:jaxrs-ri:$jerseyVersion",
+      "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
       "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion",
+      "org.glassfish.jersey.containers:jersey-container-jdk-http:$jerseyVersion",
       "org.glassfish.jersey.media:jersey-media-json-jackson:$jerseyVersion",
+      "org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion",
       "org.glassfish.jersey.ext:jersey-spring4:$jerseyVersion",
       "org.glassfish.jersey.ext:jersey-spring5:$jerseyVersion",
       "org.glassfish.jersey.ext:jersey-bean-validation:$jerseyVersion",
