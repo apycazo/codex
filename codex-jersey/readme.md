@@ -15,7 +15,7 @@ This project could use the jersey platform instead:
 
 ```groovy
 dependencies {
-    implementation plaform("org.glassfish.jersey:jersey-bom:2.30")
+  implementation plaform("org.glassfish.jersey:jersey-bom:2.30")
 }
 ```
 

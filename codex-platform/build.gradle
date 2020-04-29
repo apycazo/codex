@@ -69,5 +69,8 @@ dependencies {
       "io.cucumber:cucumber-spring:$cucumberVersion",
       "io.rest-assured:rest-assured:$restAssuredVersion"
     )
+    api( // --- others
+      "org.projectlombok:lombok:$lombok"
+    )
   }
 }
