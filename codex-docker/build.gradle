@@ -17,8 +17,21 @@ application {
   mainClassName = "apycazo.codex.docker.DockerSampleApp"
 }
 
+jar {
+  manifest {
+    attributes(
+      "Implementation-Title": "$project.name",
+      "Implementation-Version": "$project.version"
+    )
+  }
+}
+
 shadowJar {
   archiveBaseName = "codex"
   archiveClassifier = ""
   archiveVersion = ""
+  mergeServiceFiles()
+  manifest {
+    inheritFrom project.tasks.jar.manifest
+  }
 }
