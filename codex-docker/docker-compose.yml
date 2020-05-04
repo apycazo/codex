@@ -1,0 +1,11 @@
+# UP  : docker-compose up -d -build
+# LOGS: docker-compose logs
+# STOP: docker-compose stop
+# DOWN: docker-compose down
+version: "3"
+services:
+  codex:
+    build: .
+    image: codex:local
+    container_name: codex-docker
+    network_mode: "host"

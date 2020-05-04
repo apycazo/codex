@@ -1,0 +1,24 @@
+plugins {
+  id "application"
+  id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
+dependencies {
+  // dependency management
+  implementation platform(project(":codex-platform"))
+  // module dependencies
+  implementation "io.javalin:javalin"
+  implementation "com.fasterxml.jackson.core:jackson-databind"
+  implementation "org.slf4j:slf4j-api"
+  implementation "org.slf4j:slf4j-simple"
+}
+
+application {
+  mainClassName = "apycazo.codex.docker.DockerSampleApp"
+}
+
+shadowJar {
+  archiveBaseName = "codex"
+  archiveClassifier = ""
+  archiveVersion = ""
+}
