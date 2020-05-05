@@ -6,4 +6,5 @@ include 'codex-javalin'
 include 'codex-jersey'
 include 'codex-kotlin'
 include 'codex-docker'
+include 'codex-gradleplugin'
 

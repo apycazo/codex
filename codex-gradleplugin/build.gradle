@@ -1,0 +1,17 @@
+plugins {
+  id 'groovy'
+  id 'java-gradle-plugin'
+}
+
+dependencies {
+  compile gradleApi()
+}
+
+gradlePlugin {
+  plugins {
+    codexPlugin {
+      id = "codex.plugin"
+      implementationClass = "apycazo.codex.gradleplugin.CodexPluginConfig"
+    }
+  }
+}
