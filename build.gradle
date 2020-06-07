@@ -2,11 +2,6 @@ plugins {
   id "io.franzbecker.gradle-lombok" version "3.3.0" apply false
 }
 
-wrapper {
-  distributionType = Wrapper.DistributionType.ALL
-  version = "6.3"
-}
-
 subprojects {
   // --- repositories
   repositories {
