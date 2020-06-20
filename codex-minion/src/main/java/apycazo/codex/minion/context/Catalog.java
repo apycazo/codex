@@ -30,6 +30,10 @@ public class Catalog {
     return registry.values().stream();
   }
 
+  public List<BeanRecord> fetchCandidates(Class<?> clazz) {
+    return fetchCandidates(clazz, null);
+  }
+
   /**
    * Looks for an existing record in the catalog matching the class and name provided.
    * @param clazz the clazz to match (mandatory).
@@ -71,16 +75,19 @@ public class Catalog {
     name = CommonUtils.isEmptyOrBlank(name) ? registryKey : name;
     log.info("Registering key {} with name {}", registryKey, name);
     if (registry.containsKey(registryKey)) {
-      log.error("Bean class '{}' already registered", registryKey);
+      // check if name is the same, too
+      BeanRecord beanRecord = registry.get(registryKey);
+      if (beanRecord.hasName(name)) {
+        log.error("Bean class '{}' already registered with name '{}'", registryKey, name);
+        throw new CoreException(ALREADY_REGISTERED);
+      }
+    }
+    if (fetchByName(name).isPresent()) {
+      log.error("Bean name '{}' already registered", name);
       throw new CoreException(ALREADY_REGISTERED);
     } else {
-      if (fetchByName(name).isPresent()) {
-        log.error("Bean name '{}' already registered", name);
-        throw new CoreException(ALREADY_REGISTERED);
-      } else {
-        registry.put(registryKey, BeanRecord.of(instance, name));
-        return this;
-      }
+      registry.put(registryKey, BeanRecord.of(instance, name));
+      return this;
     }
   }
 

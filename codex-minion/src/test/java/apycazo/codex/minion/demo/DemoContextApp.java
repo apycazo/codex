@@ -2,9 +2,9 @@ package apycazo.codex.minion.demo;
 
 import apycazo.codex.minion.Minion;
 
-public class DemoApp {
+public class DemoContextApp {
 
   public static void main(String[] args) {
-    Minion.start(DemoApp.class);
+    Minion.start(DemoContextApp.class);
   }
 }

@@ -30,14 +30,14 @@ public class MinionContext {
   private final Properties properties;
   private final Set<String> propertySources;
   private final String[] basePackages;
-  private boolean resolved;
+  private boolean started;
 
   public MinionContext(String ... basePackagesToScan) {
     this(Collections.emptySet(), basePackagesToScan);
   }
 
   public MinionContext(Set<String> propertySources, String ... basePackagesToScan) {
-    this.resolved = false;
+    this.started = false;
     this.basePackages = basePackagesToScan == null
       ? new String[0]
       : Arrays.copyOf(basePackagesToScan, basePackagesToScan.length);
@@ -47,12 +47,10 @@ public class MinionContext {
   }
 
   public MinionContext start() {
-    if (resolved) {
+    if (started) {
       log.warn("Context already started!");
     } else {
-      // resolver properties required
-      log.debug("resolving property sources");
-      propertySources.forEach(source -> CommonUtils.readPropertiesFrom(source).ifPresent(properties::putAll));
+      resolveProperties();
       // scan packages
       try (ScanResult scanResult = new ClassGraph().enableAllInfo().whitelistPackages(basePackages).scan()) {
         // scan and instance bean providers
@@ -64,7 +62,7 @@ public class MinionContext {
         // init beans
         catalog.records().map(BeanRecord::getInstance).forEach(this::init);
       }
-      resolved = true;
+      started = true;
     }
     return this;
   }
@@ -139,8 +137,7 @@ public class MinionContext {
     }
   }
 
-  public void singletons(List<Class<?>> classList) {
-    // --- create instances
+  private void singletons(List<Class<?>> classList) {
     for (Class<?> clazz : classList) {
       Object instance = instance(clazz);
       String name = Optional // resolve the instance name, defaulting to the class name
@@ -231,5 +228,13 @@ public class MinionContext {
         }
         method.setAccessible(canAccess);
       });
+  }
+
+  private void resolveProperties() {
+    propertySources.forEach(source -> CommonUtils.readPropertiesFrom(source).ifPresent(properties::putAll));
+    properties.stringPropertyNames().forEach(key -> {
+      String currentValue = properties.getProperty(key);
+      properties.put(key, System.getProperty(key, currentValue));
+    });
   }
 }
