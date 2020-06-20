@@ -15,8 +15,7 @@ public class MinionContextTests {
   @Test
   void testContextBasics() {
     String basePackage = MinionContextTests.class.getPackageName();
-    MinionContext context = new MinionContext(basePackage);
-    Catalog catalog = context.getCatalog();
+    Catalog catalog = new MinionContext(basePackage).start().getCatalog();
     // list all
     catalog.records().forEach(record -> log.info("Record: {}", record.toString()));
     A a = catalog.getByClass(A.class);

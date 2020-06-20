@@ -11,18 +11,22 @@ public enum StatusCode {
   BEAN_CAST_FAILED(104, "Bean casting failed"),
   BEAN_INSTANCE_FAILED(105, "Bean instancing failed"),
   BASE_PACKAGE_NULL(106, "Base packages must be specified"),
+  BEAN_PROVIDER_INJECTIONS(107, "A bean provider cannot depend on other injections"),
+  OPERATION_NOT_SUPPORTED(108, "Operation is not supported"),
+  INVOCATION_ERROR(109, "Invoking a method has failed"),
   // 2xx: injection errors
   UNABLE_TO_INSTANCE(200, "Unable to instance bean"),
   UNABLE_TO_INJECT_NAMED(201, "Unable to inject named bean"),
   ALREADY_REGISTERED(203, "Bean was already registered"),
   MULTIPLE_DEFINITIONS(204, "Multiple definitions found, expected 1"),
   PROPERTY_NOT_FOUND(205, "Required property value not found"),
-  PROPERTY_TYPE_ERROR(206, "Cannot convert property to required type"),
+  PROPERTY_TYPE_ERROR(206, "Cannot convert property value not found"),
   // 3xx: consistency error
   CORRUPT_CATALOG(300, "Catalog is corrupt"),
   // 4xx: server error
-  INVALID_ADDRESS(400, "Unable to start server at the given address"),
-  INVALID_MAPPING(401, "Endpoint provided an invalid mapping"),
+  INVALID_CONTEXT(400, "Provided an invalid context"),
+  INVALID_ADDRESS(401, "Unable to start server at the given address"),
+  INVALID_MAPPING(402, "Endpoint provided an invalid mapping"),
   // 9xx: unknown
   GENERIC_ERROR(1000, "Generic error"),
   UNDEFINED_STATUS(1001, "Undefined status"),;

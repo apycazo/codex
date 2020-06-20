@@ -2,6 +2,7 @@ package apycazo.codex.minion.demo;
 
 import apycazo.codex.minion.context.MinionContext;
 import apycazo.codex.minion.context.PropertyValue;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
@@ -15,13 +16,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
-@Named("encoder-service-bean")
+@Named("report-service-bean")
 public class ReportService {
 
   @Inject // will create a singleton a report task
   private ReportTask reportTask;
   @Inject
   private MinionContext context;
+  @Inject
+  private ObjectMapper mapper;
   @PropertyValue("application.name")
   private String applicationName;
   @PropertyValue("application.intValue")
@@ -35,6 +38,7 @@ public class ReportService {
   public void start() {
     log.info("Starting application '{}'", Optional.ofNullable(applicationName).orElse("default"));
     log.info("Bool value: {}, Int value: {}", booleanValue, intValue);
+    log.info("Mapper available? {}", mapper != null);
     context.getCatalog().records().forEach(record -> log.info("Registered {}", record));
     long delay = 1_000L;
     long period = 2_500L;

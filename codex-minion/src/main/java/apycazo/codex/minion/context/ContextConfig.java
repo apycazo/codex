@@ -1,8 +1,8 @@
 package apycazo.codex.minion.context;
 
 import apycazo.codex.minion.common.CoreException;
+import apycazo.codex.minion.server.MinionServer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -40,9 +40,12 @@ public class ContextConfig {
     return this;
   }
 
-  public MinionContext start() {
-    minionContext = new MinionContext(propertySources, basePackageNames);
-    return minionContext;
+  public MinionContext load() {
+    return (minionContext = new MinionContext(propertySources, basePackageNames));
+  }
+
+  public MinionServer enableServer() {
+    return new MinionServer(withPropertySources("classpath:server.properties", "file:server.properties").load());
   }
 
   public Optional<MinionContext> getContext() {

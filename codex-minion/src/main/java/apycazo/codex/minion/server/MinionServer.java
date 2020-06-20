@@ -1,6 +1,7 @@
 package apycazo.codex.minion.server;
 
 import apycazo.codex.minion.common.CoreException;
+import apycazo.codex.minion.context.MinionContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import static apycazo.codex.minion.common.StatusCode.INVALID_MAPPING;
 @Slf4j
 public class MinionServer {
 
+  private final MinionContext context;
   private final List<Endpoint> endpoints;
   private final ObjectMapper mapper;
   private int poolSize = 10;
@@ -26,13 +28,16 @@ public class MinionServer {
   private String basePath = "";
   private HttpServer server;
 
-  public MinionServer() {
+  public MinionServer(MinionContext context) {
+    this.context = context;
     endpoints = new ArrayList<>();
     mapper = new ObjectMapper();
     port = 8080;
   }
 
   public MinionServer start() {
+    // start the bean context first
+    context.start();
     try {
       server = HttpServer.create(new InetSocketAddress(port), 0);
     } catch (IOException e) {

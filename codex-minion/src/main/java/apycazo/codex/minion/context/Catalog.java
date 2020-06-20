@@ -69,6 +69,7 @@ public class Catalog {
   public Catalog register(Object instance, String name) {
     String registryKey = instance.getClass().getName();
     name = CommonUtils.isEmptyOrBlank(name) ? registryKey : name;
+    log.info("Registering key {} with name {}", registryKey, name);
     if (registry.containsKey(registryKey)) {
       log.error("Bean class '{}' already registered", registryKey);
       throw new CoreException(ALREADY_REGISTERED);
