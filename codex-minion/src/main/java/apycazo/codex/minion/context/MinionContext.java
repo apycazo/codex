@@ -220,6 +220,12 @@ public class MinionContext {
       case "java.lang.Boolean":
       case "boolean":
         return CommonUtils.readBool(value).orElseThrow(() -> new CoreException(PROPERTY_TYPE_ERROR));
+      case "java.lang.Float":
+      case "float":
+        return CommonUtils.readFloat(value).orElseThrow(() -> new CoreException(PROPERTY_TYPE_ERROR));
+      case "java.lang.Double":
+      case "double":
+        return CommonUtils.readDouble(value).orElseThrow(() -> new CoreException(PROPERTY_TYPE_ERROR));
       default:
         log.error("Unable to process property type '{}'", typeName);
         throw new CoreException(PROPERTY_TYPE_ERROR);

@@ -112,6 +112,32 @@ public final class CommonUtils {
     }
   }
 
+  public static Optional<Float> readFloat(Object obj) {
+    if (obj == null || !obj.getClass().isAssignableFrom(Float.class)) {
+      return Optional.empty();
+    } else {
+      try {
+        return Optional.of(Float.parseFloat((String) obj));
+      } catch (Exception e) {
+        log.warn("Unable to cast as float value: {}", obj, e);
+        return Optional.empty();
+      }
+    }
+  }
+
+  public static Optional<Double> readDouble(Object obj) {
+    if (obj == null || !obj.getClass().isAssignableFrom(Float.class)) {
+      return Optional.empty();
+    } else {
+      try {
+        return Optional.of(Double.parseDouble((String) obj));
+      } catch (Exception e) {
+        log.warn("Unable to cast as float value: {}", obj, e);
+        return Optional.empty();
+      }
+    }
+  }
+
   public static boolean isEmptyOrBlank(String string) {
     return string == null || string.trim().isEmpty();
   }
