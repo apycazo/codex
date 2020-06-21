@@ -3,9 +3,13 @@ package apycazo.codex.minion.common;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 @Slf4j
 public final class CommonUtils {
@@ -112,4 +116,11 @@ public final class CommonUtils {
     return string == null || string.trim().isEmpty();
   }
 
+  public static boolean isAnnotationPresent(Field field, List<Class<? extends Annotation>> annotations) {
+    if (annotations == null) {
+      return false;
+    } else {
+      return annotations.stream().anyMatch(field::isAnnotationPresent);
+    }
+  }
 }

@@ -5,5 +5,5 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface BeanProvider {
+public @interface ConfigProvider {
 }

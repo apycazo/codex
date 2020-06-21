@@ -14,6 +14,7 @@ public enum StatusCode {
   BEAN_PROVIDER_INJECTIONS(107, "A bean provider cannot depend on other injections"),
   OPERATION_NOT_SUPPORTED(108, "Operation is not supported"),
   INVOCATION_ERROR(109, "Invoking a method has failed"),
+  INVALID_PROPERTY_SOURCE(110, "Invalid property source"),
   // 2xx: injection errors
   UNABLE_TO_INSTANCE(200, "Unable to instance bean"),
   UNABLE_TO_INJECT_NAMED(201, "Unable to inject named bean"),

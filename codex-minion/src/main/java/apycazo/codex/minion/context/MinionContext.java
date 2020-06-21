@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -32,11 +33,11 @@ public class MinionContext {
   private final String[] basePackages;
   private boolean started;
 
-  public MinionContext(String ... basePackagesToScan) {
+  public MinionContext(String... basePackagesToScan) {
     this(Collections.emptySet(), basePackagesToScan);
   }
 
-  public MinionContext(Set<String> propertySources, String ... basePackagesToScan) {
+  public MinionContext(Set<String> propertySources, String... basePackagesToScan) {
     this.started = false;
     this.basePackages = basePackagesToScan == null
       ? new String[0]
@@ -54,7 +55,7 @@ public class MinionContext {
       // scan packages
       try (ScanResult scanResult = new ClassGraph().enableAllInfo().whitelistPackages(basePackages).scan()) {
         // scan and instance bean providers
-        beanProviders(scanForAnnotation(scanResult, BeanProvider.class));
+        configProviders(scanForAnnotation(scanResult, ConfigProvider.class));
         // scan and instance singletons
         singletons(scanForAnnotation(scanResult, Singleton.class));
         // resolve catalog injections
@@ -104,13 +105,27 @@ public class MinionContext {
     }
   }
 
-  public void beanProviders(List<Class<?>> classList) {
+  private void configProviders(List<Class<?>> classList) {
+    List<Class<? extends Annotation>> forbiddenAnnotations = Stream
+      .of(Singleton.class, Prototype.class, PropertyValue.class)
+      .collect(Collectors.toList());
     for (Class<?> clazz : classList) {
       if (Stream.of(clazz.getDeclaredFields())
-        .anyMatch(field -> field.isAnnotationPresent(Singleton.class) || field.isAnnotationPresent(Prototype.class))) {
+        .anyMatch(field -> CommonUtils.isAnnotationPresent(field, forbiddenAnnotations))) {
         log.error("Injections are not allowed on bean providers");
         throw new CoreException(BEAN_PROVIDER_INJECTIONS);
       } else {
+        // inject any extra property sources declared here
+        if (clazz.isAnnotationPresent(PropertySource.class)) {
+          PropertySource propertySource = clazz.getAnnotation(PropertySource.class);
+          resolveProperties(propertySource.location(), propertySource.mandatory());
+        }
+        if (clazz.isAnnotationPresent(PropertySources.class)) {
+          PropertySource[] propertySources = clazz.getAnnotation(PropertySources.class).value();
+          for (PropertySource propertySource : propertySources) {
+            resolveProperties(propertySource.location(), propertySource.mandatory());
+          }
+        }
         Object instance = instance(clazz);
         for (Method method : clazz.getDeclaredMethods()) {
           if (method.isAnnotationPresent(Singleton.class)) {
@@ -148,7 +163,6 @@ public class MinionContext {
   }
 
   private void resolveInjections() {
-    // --- resolve dependencies
     catalog.records().forEach(record -> {
       Object instance = record.getInstance();
       Stream.of(instance.getClass().getDeclaredFields())
@@ -212,6 +226,13 @@ public class MinionContext {
     }
   }
 
+  /**
+   * Looks for the @PostConstruct annotation on any method(s) and invoke it. Note that only one
+   * method should be annotated with @PostConstruct, but this method does not care about it.
+   *
+   * @param instance the object to initialize.
+   * @see <a href="https://docs.oracle.com/javaee/7/api/javax/annotation/PostConstruct.html">PostConstruct</a>
+   */
   private void init(Object instance) {
     Stream
       .of(instance.getClass().getDeclaredMethods())
@@ -230,11 +251,32 @@ public class MinionContext {
       });
   }
 
+  /**
+   * Resolves all properties defined by property sources. Note that @ConfigProvider annotations can add extra
+   * property sources after this method has been called.
+   * <p></p>
+   * Properties resolved by this method are not mandatory by default.
+   */
   private void resolveProperties() {
-    propertySources.forEach(source -> CommonUtils.readPropertiesFrom(source).ifPresent(properties::putAll));
-    properties.stringPropertyNames().forEach(key -> {
-      String currentValue = properties.getProperty(key);
-      properties.put(key, System.getProperty(key, currentValue));
-    });
+    propertySources.forEach(source -> resolveProperties(source, false));
+  }
+
+  /**
+   * Resolves a property from a single source.
+   * @param source the property source location.
+   * @param mandatory indicates if the method should throw an exception when the source is not found.
+   */
+  private void resolveProperties(String source, boolean mandatory) {
+    Optional<Properties> sourceProperties = CommonUtils.readPropertiesFrom(source);
+    if (sourceProperties.isPresent()) {
+      this.properties.putAll(sourceProperties.get());
+      this.properties.stringPropertyNames().forEach(key -> {
+        String currentValue = this.properties.getProperty(key);
+        this.properties.put(key, System.getProperty(key, currentValue));
+      });
+    } else if (mandatory) {
+      log.error("Mandatory property source '{}' not found", source);
+      throw new CoreException(INVALID_PROPERTY_SOURCE);
+    }
   }
 }
