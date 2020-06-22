@@ -34,7 +34,7 @@ public class ConditionResolver {
     } else if (annotatedElement.isAnnotationPresent(OnPropertyCondition.class)) {
       OnPropertyCondition condition = annotatedElement.getAnnotation(OnPropertyCondition.class);
       String key = condition.value();
-      String matching = condition.value();
+      String matching = condition.matching();
       Optional<String> property = catalog.getProperty(key);
       if (property.isEmpty()) {
         return condition.matchOnMissing();
