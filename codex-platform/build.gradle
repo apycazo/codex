@@ -24,7 +24,8 @@ dependencies {
     api( // --- java
       "javax.annotation:javax.annotation-api:$annotationApi",
       "javax.xml.bind:jaxb-api:$jaxbApiVersion",
-      "javax.servlet:javax.servlet-api:$servletApiVersion"
+      "javax.servlet:javax.servlet-api:$servletApiVersion",
+      "javax.inject:javax.inject:$javaInjectVersion"
     )
     api( // --- loggers
       "org.slf4j:slf4j-api:$slf4jVersion",
@@ -53,7 +54,8 @@ dependencies {
     api( // --- others
       "io.javalin:javalin:$javalin",
       "org.projectlombok:lombok:$lombok",
-      "org.yaml:snakeyaml:$snakeYamlVersion"
+      "org.yaml:snakeyaml:$snakeYamlVersion",
+      "io.github.classgraph:classgraph:$classGraphVersion"
     )
   }
 }
