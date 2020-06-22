@@ -1,7 +1,7 @@
 package apycazo.codex.minion.server;
 
 import apycazo.codex.minion.common.CoreException;
-import apycazo.codex.minion.context.BeanRecord;
+import apycazo.codex.minion.context.catalog.BeanRecord;
 import apycazo.codex.minion.context.MinionContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
@@ -17,7 +17,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static apycazo.codex.minion.common.StatusCode.INVALID_ADDRESS;
 import static apycazo.codex.minion.common.StatusCode.INVALID_MAPPING;
 
-// ref: https://dzone.com/articles/simple-http-server-in-java
+/**
+ * Uses a MinionContext beans implementing 'Endpoint' to create a simple rest service server.
+ */
 @Slf4j
 public class MinionServer {
 

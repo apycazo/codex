@@ -1,4 +1,4 @@
-package apycazo.codex.minion.context;
+package apycazo.codex.minion.context.properties;
 
 import java.lang.annotation.*;
 

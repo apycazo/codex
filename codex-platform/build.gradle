@@ -11,10 +11,20 @@ publishing {
   }
 }
 
+javaPlatform {
+  allowDependencies()
+}
+
 dependencies {
+  api platform("org.junit:junit-bom:$junitVersion")
+  api platform("org.glassfish.jersey:jersey-bom:$jerseyVersion")
+  api platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion")
+  api platform("org.eclipse.jetty:jetty-bom:$jettyVersion")
   constraints {
     api( // --- java
-      "javax.annotation:javax.annotation-api:$annotationApi"
+      "javax.annotation:javax.annotation-api:$annotationApi",
+      "javax.xml.bind:jaxb-api:$jaxbApiVersion",
+      "javax.servlet:javax.servlet-api:$servletApiVersion"
     )
     api( // --- loggers
       "org.slf4j:slf4j-api:$slf4jVersion",
@@ -26,10 +36,6 @@ dependencies {
       "ch.qos.logback:logback-core:$logbackVersion",
       "ch.qos.logback:logback-classic:$logbackVersion"
     )
-    api( // --- parsers
-      "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-      "org.yaml:snakeyaml:$snakeYamlVersion"
-    )
     api( // --- spring
       "org.springframework:spring-context:$springVersion",
       "org.springframework:spring-core:$springVersion",
@@ -37,32 +43,7 @@ dependencies {
       "org.springframework:spring-web:$springVersion",
       "org.springframework:spring-tx:$springVersion"
     )
-    api( // --- jersey
-      "org.glassfish.jersey.bundles:jaxrs-ri:$jerseyVersion",
-      "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
-      "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion",
-      "org.glassfish.jersey.containers:jersey-container-jdk-http:$jerseyVersion",
-      "org.glassfish.jersey.media:jersey-media-json-jackson:$jerseyVersion",
-      "org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion",
-      "org.glassfish.jersey.ext:jersey-spring4:$jerseyVersion",
-      "org.glassfish.jersey.ext:jersey-spring5:$jerseyVersion",
-      "org.glassfish.jersey.ext:jersey-bean-validation:$jerseyVersion",
-      "javax.servlet:javax.servlet-api:$servletApiVersion",
-      "javax.xml.bind:jaxb-api:$jaxbApiVersion"
-    )
-    api( // --- jetty
-      "org.eclipse.jetty:jetty-server:$jettyVersion",
-      "org.eclipse.jetty:jetty-servlet:$jettyVersion",
-      "org.eclipse.jetty:jetty-config:$jettyVersion",
-      "javax.xml.bind:jaxb-api:$jaxbApiVersion"
-    )
-    api ( // --- frameworks
-      "io.javalin:javalin:$javalin"
-    )
     api( // --- test frameworks
-      "org.junit.jupiter:junit-jupiter-api:$junitVersion",
-      "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
-      "org.junit.jupiter:junit-jupiter-params:$junitVersion",
       "org.assertj:assertj-core:$assertjVersion",
       "io.cucumber:cucumber-java:$cucumberVersion",
       "io.cucumber:cucumber-junit:$cucumberVersion",
@@ -70,7 +51,9 @@ dependencies {
       "io.rest-assured:rest-assured:$restAssuredVersion"
     )
     api( // --- others
-      "org.projectlombok:lombok:$lombok"
+      "io.javalin:javalin:$javalin",
+      "org.projectlombok:lombok:$lombok",
+      "org.yaml:snakeyaml:$snakeYamlVersion"
     )
   }
 }

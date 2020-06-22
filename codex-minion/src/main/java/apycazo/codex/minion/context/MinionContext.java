@@ -3,6 +3,13 @@ package apycazo.codex.minion.context;
 import apycazo.codex.minion.common.CommonUtils;
 import apycazo.codex.minion.common.CoreException;
 import apycazo.codex.minion.common.StatusCode;
+import apycazo.codex.minion.context.catalog.BeanRecord;
+import apycazo.codex.minion.context.catalog.Catalog;
+import apycazo.codex.minion.context.conditions.ConditionResolver;
+import apycazo.codex.minion.context.conditions.OnPropertyCondition;
+import apycazo.codex.minion.context.properties.PropertySource;
+import apycazo.codex.minion.context.properties.PropertySources;
+import apycazo.codex.minion.context.properties.PropertyValue;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
@@ -22,6 +29,9 @@ import java.util.stream.Stream;
 
 import static apycazo.codex.minion.common.StatusCode.*;
 
+/**
+ * Defines the main dependency injection context, being tasked with bean instancing and dependency injection.
+ */
 @Slf4j
 public class MinionContext {
 
@@ -33,10 +43,19 @@ public class MinionContext {
   private final String[] basePackages;
   private boolean started;
 
+  /**
+   * Configures a new context, given a set of property sources and base packages to look for bean definitions.
+   * @param basePackagesToScan a var args array of packages defining where to look to find bean definitions.
+   */
   public MinionContext(String... basePackagesToScan) {
     this(Collections.emptySet(), basePackagesToScan);
   }
 
+  /**
+   * Configures a new context, given a set of property sources and base packages to look for bean definitions.
+   * @param propertySources a set of property sources to use by default.
+   * @param basePackagesToScan a var args array of packages defining where to look to find bean definitions.
+   */
   public MinionContext(Set<String> propertySources, String... basePackagesToScan) {
     this.started = false;
     this.basePackages = basePackagesToScan == null
@@ -44,20 +63,27 @@ public class MinionContext {
       : Arrays.copyOf(basePackagesToScan, basePackagesToScan.length);
     this.propertySources = Collections.unmodifiableSet(propertySources);
     this.properties = new Properties();
+    // create a new catalog with the existing property instance, and registers itself.
     this.catalog = new Catalog(properties, this);
   }
 
+  /**
+   * Starts the context with the existing configuration. This method will scan for any bean available and resolve
+   * whatever injections are required. The beans references are included into an internal catalog. This instance can be
+   * injected into other beans.
+   * @return the generated context.
+   */
   public MinionContext start() {
     if (started) {
       log.warn("Context already started!");
     } else {
-      resolveProperties();
+      resolveProperties(); // runs the initial property resolution, config providers might inject more values.
       // scan packages
       try (ScanResult scanResult = new ClassGraph().enableAllInfo().whitelistPackages(basePackages).scan()) {
         // scan and instance bean providers
-        configProviders(scanForAnnotation(scanResult, ConfigProvider.class));
+        configProviders(filterByAnnotation(scanResult, ConfigProvider.class));
         // scan and instance singletons
-        singletons(scanForAnnotation(scanResult, Singleton.class));
+        singletons(filterByAnnotation(scanResult, Singleton.class));
         // resolve catalog injections
         resolveInjections();
         // init beans
@@ -68,6 +94,12 @@ public class MinionContext {
     return this;
   }
 
+  /**
+   * Creates an instance of the provided class and resolves any injections required.
+   * @param clazz the class to instance and inject.
+   * @param <T> the class type to respond with.
+   * @return the resolved bean.
+   */
   public <T> T prototype(Class<? extends T> clazz) {
     T instance = instance(clazz);
     Stream.of(instance.getClass().getDeclaredFields())
@@ -76,7 +108,13 @@ public class MinionContext {
     return instance;
   }
 
-  private List<Class<?>> scanForAnnotation(ScanResult scanResult, Class<?> clazz) {
+  /**
+   * Filters the scan result by the annotation required.
+   * @param scanResult the scan result we are filtering.
+   * @param clazz the annotation class we are looking for.
+   * @return the list of classes found to be annotated with the required element.
+   */
+  private List<Class<?>> filterByAnnotation(ScanResult scanResult, Class<? extends Annotation> clazz) {
     return scanResult
       .getClassesWithAnnotation(clazz.getName())
       .stream()
@@ -84,6 +122,11 @@ public class MinionContext {
       .collect(Collectors.toList());
   }
 
+  /**
+   * Returns a class from the name provided by the given class info instance.
+   * @param classInfo the info object to process.
+   * @return the class generated from the name found.
+   */
   private Class<?> resolveClass(ClassInfo classInfo) {
     try {
       return Class.forName(classInfo.getName());
@@ -93,6 +136,12 @@ public class MinionContext {
     }
   }
 
+  /**
+   * Creates a simple instance of the required class, calling the constructor.
+   * @param clazz the class se are instancing.
+   * @param <T> the actual class type we are trying to return.
+   * @return the instance created.
+   */
   private <T> T instance(Class<? extends T> clazz) {
     if (clazz.isInterface()) {
       log.error("Interfaces are not allowed as beans");
@@ -105,9 +154,16 @@ public class MinionContext {
     }
   }
 
+  /**
+   * Evaluates the provided class list as config provider elements. Notice that the provider instance is not registered,
+   * as are all the methods annotated with @Singleton.<p></p>
+   * Providers do not allow for field injection, and will throw an exception if an attempt pf this is made. Also notice
+   * that providers are always instanced, not allowing any condition annotation
+   * @param classList the classes to process as configuration providers.
+   */
   private void configProviders(List<Class<?>> classList) {
     List<Class<? extends Annotation>> forbiddenAnnotations = Stream
-      .of(Singleton.class, Prototype.class, PropertyValue.class)
+      .of(Singleton.class, Prototype.class, PropertyValue.class, OnPropertyCondition.class)
       .collect(Collectors.toList());
     for (Class<?> clazz : classList) {
       if (Stream.of(clazz.getDeclaredFields())
@@ -119,7 +175,7 @@ public class MinionContext {
         if (clazz.isAnnotationPresent(PropertySource.class)) {
           PropertySource propertySource = clazz.getAnnotation(PropertySource.class);
           resolveProperties(propertySource.location(), propertySource.mandatory());
-        }
+        } // both annotations can be used together.
         if (clazz.isAnnotationPresent(PropertySources.class)) {
           PropertySource[] propertySources = clazz.getAnnotation(PropertySources.class).value();
           for (PropertySource propertySource : propertySources) {
@@ -127,7 +183,11 @@ public class MinionContext {
           }
         }
         Object instance = instance(clazz);
-        for (Method method : clazz.getDeclaredMethods()) {
+        List<Method> methods = Stream.of(clazz.getDeclaredMethods())
+          .filter(method -> method.isAnnotationPresent(Singleton.class))
+          .filter(method -> ConditionResolver.matchesConditions(catalog, method))
+          .collect(Collectors.toList());
+        for (Method method : methods) {
           if (method.isAnnotationPresent(Singleton.class)) {
             if (method.getParameters().length != 0) {
               log.error("Bean provider methods cannot have parameters");
@@ -152,8 +212,12 @@ public class MinionContext {
     }
   }
 
+  /**
+   * Instances and registers all classes provided as singletons.
+   * @param classList the classes to instance as singletons.
+   */
   private void singletons(List<Class<?>> classList) {
-    for (Class<?> clazz : classList) {
+    for (Class<?> clazz : ConditionResolver.filterByCondition(catalog, classList)) {
       Object instance = instance(clazz);
       String name = Optional // resolve the instance name, defaulting to the class name
         .ofNullable(clazz.getAnnotation(Named.class))
@@ -162,6 +226,9 @@ public class MinionContext {
     }
   }
 
+  /**
+   * Resolves all injections required by the currently instanced beans found in the catalog.
+   */
   private void resolveInjections() {
     catalog.records().forEach(record -> {
       Object instance = record.getInstance();
@@ -171,6 +238,12 @@ public class MinionContext {
     });
   }
 
+  /**
+   * Injects whatever value is required by the given field. Notice that fields with more than one valid annotation
+   * will not throw an error, but only the first annotation will be considered.
+   * @param instance the instance we are trying to inject into.
+   * @param field the current injection field required.
+   */
   private void injectDependency(Object instance, Field field) {
     try {
       field.setAccessible(true);
@@ -208,6 +281,12 @@ public class MinionContext {
     }
   }
 
+  /**
+   * Resolves a property as required by the provided field from the catalog property sources.
+   * @param field the field we are trying to inject in.
+   * @param key the property key we are using.
+   * @return the value to inject.
+   */
   private Object resolveProperty(Field field, String key) {
     String value = catalog.getProperty(key).orElseThrow(() -> new CoreException(PROPERTY_NOT_FOUND));
     String typeName = field.getType().getName();

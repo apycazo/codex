@@ -1,4 +1,4 @@
-package apycazo.codex.minion.context;
+package apycazo.codex.minion.context.catalog;
 
 import apycazo.codex.minion.common.CommonUtils;
 import apycazo.codex.minion.common.CoreException;

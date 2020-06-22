@@ -1,7 +1,7 @@
 package apycazo.codex.minion.demo;
 
 import apycazo.codex.minion.context.MinionContext;
-import apycazo.codex.minion.context.PropertyValue;
+import apycazo.codex.minion.context.properties.PropertyValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 

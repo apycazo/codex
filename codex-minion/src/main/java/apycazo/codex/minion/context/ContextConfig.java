@@ -44,10 +44,6 @@ public class ContextConfig {
     return (minionContext = new MinionContext(propertySources, basePackageNames));
   }
 
-  public MinionServer enableServer() {
-    return new MinionServer(withPropertySources("classpath:server.properties", "file:server.properties").load());
-  }
-
   public Optional<MinionContext> getContext() {
     return Optional.ofNullable(minionContext);
   }

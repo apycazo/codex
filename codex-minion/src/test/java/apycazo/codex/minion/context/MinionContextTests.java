@@ -1,5 +1,6 @@
 package apycazo.codex.minion.context;
 
+import apycazo.codex.minion.context.catalog.Catalog;
 import apycazo.codex.minion.context.subjects.A;
 import apycazo.codex.minion.context.subjects.B;
 import apycazo.codex.minion.context.subjects.X;
