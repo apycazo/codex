@@ -44,6 +44,10 @@ dependencies {
       "org.springframework:spring-web:$springVersion",
       "org.springframework:spring-tx:$springVersion"
     )
+    api( // --- persistence
+      "org.hibernate:hibernate-core:$hibernate",
+      "mysql:mysql-connector-java:$mysqlConnector"
+    )
     api( // --- test frameworks
       "org.assertj:assertj-core:$assertjVersion",
       "io.cucumber:cucumber-java:$cucumberVersion",

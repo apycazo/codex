@@ -10,7 +10,7 @@ subprojects {
   // --- configure projects
   def ignoredProjects = ["codex-platform"]
   if (!ignoredProjects.contains(project.name)) {
-    apply plugin: "java"
+    apply plugin: "java-library"
     apply plugin: "io.franzbecker.gradle-lombok"
     dependencies {
       implementation platform(project(":codex-platform"))
