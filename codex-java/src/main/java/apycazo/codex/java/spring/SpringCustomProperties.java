@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringValueResolver;
 
@@ -21,7 +22,7 @@ public class SpringCustomProperties {
   /**
    * Runs the test. Will take the properties from 'demo.properties', and modify the value for 'mutable.value' from
    * the expected value to just 'eureka!', the other property will be resolved normally.
-   * @param args
+   * @param args method arguments, unused.
    */
   public static void main(String[] args) {
     AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
@@ -50,7 +51,7 @@ public class SpringCustomProperties {
 
     @Override
     protected void doProcessProperties(
-      ConfigurableListableBeanFactory beanFactoryToProcess, StringValueResolver valueResolver) {
+      @NonNull ConfigurableListableBeanFactory beanFactoryToProcess, @NonNull StringValueResolver valueResolver) {
       super.doProcessProperties(beanFactoryToProcess, new CustomValueResolver(valueResolver));
     }
   }
@@ -64,7 +65,7 @@ public class SpringCustomProperties {
     }
 
     @Override
-    public String resolveStringValue(String strVal) {
+    public String resolveStringValue(@NonNull String strVal) {
       String baseValue = baseResolver.resolveStringValue(strVal);
       log.info("Eval: {}, Resolver value: {}", strVal, baseValue);
       if ("rand".equals(baseValue)) {
