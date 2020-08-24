@@ -42,6 +42,8 @@ dependencies {
       "org.springframework:spring-core:$springVersion",
       "org.springframework:spring-test:$springVersion",
       "org.springframework:spring-web:$springVersion",
+      "org.springframework:spring-jdbc:$springVersion",
+      "org.springframework:spring-orm:$springVersion",
       "org.springframework:spring-tx:$springVersion"
     )
     api( // --- persistence
