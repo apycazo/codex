@@ -48,7 +48,9 @@ dependencies {
     )
     api( // --- persistence
       "org.hibernate:hibernate-core:$hibernate",
-      "mysql:mysql-connector-java:$mysqlConnector"
+      "mysql:mysql-connector-java:$mysqlConnector",
+      "org.apache.commons:commons-dbcp2:$dbcp2"
+
     )
     api( // --- test frameworks
       "org.assertj:assertj-core:$assertjVersion",
