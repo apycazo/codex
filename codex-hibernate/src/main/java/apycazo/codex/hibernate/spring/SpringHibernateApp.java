@@ -47,6 +47,12 @@ public class SpringHibernateApp {
       // find john
       List<BasicUserEntity> john = repository.findJohn();
       log.info("John? {}", john);
+      // delete and recreate with examples
+      repository.remove(john.get(0));
+      BasicUserEntity.examples().forEach(repository::persist);
+      // find active users
+      List<BasicUserEntity> activeUsers = repository.findActive();
+      activeUsers.forEach(u -> log.info("User: {}", u));
     }
   }
 

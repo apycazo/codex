@@ -21,6 +21,7 @@ public class HibernateUtil {
     Properties properties = new Properties();
     properties.put(Environment.DIALECT, DEFAULT_DIALECT);
     properties.put(Environment.HBM2DDL_AUTO, "create-drop");
+    properties.put("hibernate.show_sql", "false");
     return properties;
   }
 
@@ -41,7 +42,7 @@ public class HibernateUtil {
     Properties properties = properties(driver, dialect, url, usr, pwd);
     Configuration configuration = new Configuration();
     configuration.setProperties(properties);
-    // configuration.addAnnotatedClass(...)
+    // After this, register classes with: configuration.addAnnotatedClass(...)
     return configuration;
   }
 
