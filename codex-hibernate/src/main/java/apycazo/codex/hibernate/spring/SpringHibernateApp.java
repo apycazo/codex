@@ -44,6 +44,9 @@ public class SpringHibernateApp {
       List<BasicUserEntity> list = repository.find();
       log.info("User count: {}", list.size());
       list.forEach(u -> log.info("User: {}", u));
+      // find john
+      List<BasicUserEntity> john = repository.findJohn();
+      log.info("John? {}", john);
     }
   }
 

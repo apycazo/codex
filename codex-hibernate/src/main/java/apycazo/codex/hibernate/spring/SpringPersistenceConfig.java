@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 public class SpringPersistenceConfig {
 
-  @Bean
+  @Bean(destroyMethod = "close")
   public DataSource dataSource(@Value("${db.driver}") String driver, @Value("${db.url}") String url,
                                @Value("${db.usr}") String usr, @Value("${db.pwd}") String pwd) {
     BasicDataSource datasource = new BasicDataSource();
@@ -36,7 +36,7 @@ public class SpringPersistenceConfig {
     return sessionFactory;
   }
 
-  @Bean
+  @Bean // another option: DataSourceTransactionManager
   public HibernateTransactionManager transactionManager(LocalSessionFactoryBean sessionFactory) {
     HibernateTransactionManager txManager = new HibernateTransactionManager();
     txManager.setSessionFactory(sessionFactory.getObject());
