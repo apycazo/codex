@@ -17,14 +17,6 @@ public class HibernateUtil {
     return configuration(DEFAULT_DRIVER, DEFAULT_DIALECT, url, usr, pwd);
   }
 
-  public Properties basicProperties() {
-    Properties properties = new Properties();
-    properties.put(Environment.DIALECT, DEFAULT_DIALECT);
-    properties.put(Environment.HBM2DDL_AUTO, "create-drop");
-    properties.put("hibernate.show_sql", "false");
-    return properties;
-  }
-
   public Properties properties(String driver, String dialect, String url, String usr, String pwd) {
     Properties properties = new Properties();
     properties.put(Environment.DRIVER, driver);
