@@ -63,7 +63,9 @@ dependencies {
       "io.javalin:javalin:$javalin",
       "org.projectlombok:lombok:$lombok",
       "org.yaml:snakeyaml:$snakeYamlVersion",
-      "io.github.classgraph:classgraph:$classGraphVersion"
+      "io.github.classgraph:classgraph:$classGraphVersion",
+      "info.picocli:picocli:$picocli",
+      "info.picocli:picocli-codegen:$picocli"
     )
   }
 }

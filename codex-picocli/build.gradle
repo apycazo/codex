@@ -1,0 +1,20 @@
+plugins {
+  id "application"
+  id "com.github.johnrengelman.shadow" version "6.0.0"
+}
+
+application {
+  mainClassName = "apycazo.codex.picocli.CliApp"
+}
+
+dependencies {
+  annotationProcessor platform(project(":codex-platform"))
+  implementation "info.picocli:picocli"
+  annotationProcessor "info.picocli:picocli-codegen"
+}
+
+shadowJar {
+  archiveBaseName = 'pico'
+  archiveClassifier = ''
+  archiveVersion = ''
+}
