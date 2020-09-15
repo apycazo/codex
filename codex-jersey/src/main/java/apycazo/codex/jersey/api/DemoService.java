@@ -1,6 +1,5 @@
-package apycazo.codex.jersey.service;
+package apycazo.codex.jersey.api;
 
-import apycazo.codex.jersey.InfoResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.Instant;

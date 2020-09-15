@@ -1,4 +1,4 @@
-package apycazo.codex.jersey;
+package apycazo.codex.jersey.api;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +9,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class InfoResource {
+
   @Builder.Default
   private String id = UUID.randomUUID().toString().substring(24);
   @Builder.Default

@@ -11,10 +11,14 @@ import java.net.URI;
 public class JerseyApp {
 
   public static void main(String[] args) {
-    URI baseUri = UriBuilder.fromUri("http://localhost/").port(8080).build();
+    start(8080);
+  }
+
+  static HttpServer start(int port) {
+    URI baseUri = UriBuilder.fromUri("http://localhost/").port(port).build();
     ResourceConfig config = new AppResourceConfig();
     HttpServer server = JdkHttpServerFactory.createHttpServer(baseUri, config);
     Runtime.getRuntime().addShutdownHook(new Thread(() -> server.stop(2)));
-//    server.start();
+    return server;
   }
 }

@@ -21,8 +21,10 @@ subprojects {
 // starters
 ext {
   testing = [
-    "org.junit.jupiter:junit-jupiter-api",
-    "org.junit.jupiter:junit-jupiter-engine",
+    "org.junit.jupiter:junit-jupiter",
+    "org.junit.platform:junit-platform-runner",
+//    "org.junit.jupiter:junit-jupiter-api",
+//    "org.junit.jupiter:junit-jupiter-engine",
     "org.assertj:assertj-core",
     "io.cucumber:cucumber-java",
     "io.cucumber:cucumber-junit",
