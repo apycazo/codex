@@ -20,6 +20,7 @@ dependencies {
   api platform("org.glassfish.jersey:jersey-bom:$jerseyVersion")
   api platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion")
   api platform("org.eclipse.jetty:jetty-bom:$jettyVersion")
+  api platform("io.github.openfeign:feign-bom:$feignVersion")
   constraints {
     api( // --- java
       "javax.annotation:javax.annotation-api:$annotationApi",
@@ -65,7 +66,8 @@ dependencies {
       "org.yaml:snakeyaml:$snakeYamlVersion",
       "io.github.classgraph:classgraph:$classGraphVersion",
       "info.picocli:picocli:$picocli",
-      "info.picocli:picocli-codegen:$picocli"
+      "info.picocli:picocli-codegen:$picocli",
+      "io.github.openfeign.form:feign-form:$feignFormVersion"
     )
   }
 }

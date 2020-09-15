@@ -1,0 +1,8 @@
+dependencies {
+  implementation logback
+  implementation "io.github.openfeign:feign-core"
+  implementation "io.github.openfeign:feign-slf4j"
+  implementation "io.github.openfeign:feign-jackson"
+  implementation "io.github.openfeign:feign-okhttp"
+  implementation "io.github.openfeign.form:feign-form"
+}

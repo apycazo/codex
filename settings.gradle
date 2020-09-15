@@ -10,4 +10,5 @@ include 'codex-gradleplugin'
 include 'codex-minion'
 include 'codex-hibernate'
 include 'codex-picocli'
+include 'codex-feign'
 
