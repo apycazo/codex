@@ -53,6 +53,11 @@ dependencies {
       "org.apache.commons:commons-dbcp2:$dbcp2",
       "com.h2database:h2:$h2db"
     )
+    api( // --- graphql
+      "com.graphql-java:graphql-java:$graphql",
+      "com.graphql-java:graphql-java-tools:$graphqlTools",
+      "com.graphql-java:graphql-java-annotations:$graphqlAnnotations",
+    )
     api( // --- test frameworks
       "org.assertj:assertj-core:$assertjVersion",
       "io.cucumber:cucumber-java:$cucumberVersion",
@@ -61,6 +66,7 @@ dependencies {
       "io.rest-assured:rest-assured:$restAssuredVersion"
     )
     api( // --- others
+      "io.ratpack:ratpack.core:$ratpack",
       "io.javalin:javalin:$javalin",
       "org.projectlombok:lombok:$lombok",
       "org.yaml:snakeyaml:$snakeYamlVersion",

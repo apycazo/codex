@@ -13,6 +13,7 @@ Reference code library
 + **codex-platform**: project-wide gradle platform (BOM) for dependency management.
 + **codex-minion**: a lab project on how to implement dependency injection.
 + **codex-picocli**: command line example with PicoCLI.
++ **codex-feign**: Simple Http client implementation using open feign.
 
 ## Reference platforms
 
