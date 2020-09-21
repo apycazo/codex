@@ -10,5 +10,5 @@ dependencies {
   // --- h2 database
   implementation "com.h2database:h2"
   // --- extras
-  implementation logback
+  implementation logback + testing
 }
