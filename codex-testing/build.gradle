@@ -1,0 +1,15 @@
+dependencies {
+  implementation logback
+  implementation "org.springframework:spring-context"
+  // test only
+  testImplementation "org.junit.jupiter:junit-jupiter"
+  testImplementation "org.junit.platform:junit-platform-runner"
+  testImplementation "org.junit.jupiter:junit-jupiter-params" // required to run parametrized tests
+  testImplementation "io.rest-assured:rest-assured"
+  testImplementation "org.assertj:assertj-core"
+  // only for spring tests
+  testImplementation "org.springframework:spring-test"
+  // only for mocks
+  testImplementation "org.mockito:mockito-core"
+  testImplementation "org.mockito:mockito-junit-jupiter"
+}
