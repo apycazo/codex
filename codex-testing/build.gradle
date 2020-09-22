@@ -1,6 +1,11 @@
 dependencies {
+  // generic
   implementation logback
+  // spring services
   implementation "org.springframework:spring-context"
+  // rest service
+  implementation "io.javalin:javalin"
+  implementation "com.fasterxml.jackson.core:jackson-databind"
   // test only
   testImplementation "org.junit.jupiter:junit-jupiter"
   testImplementation "org.junit.platform:junit-platform-runner"
@@ -12,4 +17,5 @@ dependencies {
   // only for mocks
   testImplementation "org.mockito:mockito-core"
   testImplementation "org.mockito:mockito-junit-jupiter"
+
 }
