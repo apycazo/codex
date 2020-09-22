@@ -39,9 +39,6 @@ implementation platform("io.spring.platform:platform-bom:Cairo-SR8")
 
 ## TODO-List
 
-+ picocli
 + rxJava
-+ Mockito/Test demo
-+ GraphQL 
 + Quarkus
 

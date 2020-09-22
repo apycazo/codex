@@ -11,4 +11,5 @@ include 'codex-minion'
 include 'codex-hibernate'
 include 'codex-picocli'
 include 'codex-feign'
+include 'codex-testing'
 
