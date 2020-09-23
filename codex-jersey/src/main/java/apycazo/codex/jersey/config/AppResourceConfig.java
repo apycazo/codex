@@ -17,5 +17,6 @@ public class AppResourceConfig extends ResourceConfig {
     springContext.refresh();
     property("contextConfig", springContext);
     packages(JerseyApp.class.getPackage().getName());
+    log.info("Config done");
   }
 }

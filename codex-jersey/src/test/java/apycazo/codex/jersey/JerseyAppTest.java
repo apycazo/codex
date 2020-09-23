@@ -65,4 +65,12 @@ class JerseyAppTest {
       .and().log().all();
   }
 
+  @Test
+  void subresource_responds_ok() {
+    given().port(server.getAddress().getPort())
+      .when().get("/subresource/a")
+      .then().log().all()
+      .and().statusCode(200)
+      .and().body("msg", equalTo("Value A"));
+  }
 }
