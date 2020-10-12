@@ -8,7 +8,7 @@ subprojects {
     mavenCentral()
   }
   // --- configure projects
-  def ignoredProjects = ["codex-platform"]
+  def ignoredProjects = ["codex-platform", "codex-golem"]
   if (!ignoredProjects.contains(project.name)) {
     apply plugin: "java-library"
     apply plugin: "io.franzbecker.gradle-lombok"

@@ -12,4 +12,5 @@ include 'codex-hibernate'
 include 'codex-picocli'
 include 'codex-feign'
 include 'codex-testing'
+include 'codex-golem'
 
