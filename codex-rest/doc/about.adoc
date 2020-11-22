@@ -1,0 +1,17 @@
+== About
+
+This is a sample document which will be served through the service deployed.
+
+=== How to render code
+
+.Java sample source
+[source,java,linenums]
+----
+interface Identity {
+
+    String getId(); // <1>
+}
+----
+<1> The method the interface implements.
+
+<<<

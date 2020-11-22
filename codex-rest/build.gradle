@@ -1,0 +1,82 @@
+plugins {
+  id "org.asciidoctor.convert" version "1.5.9.2"
+  id "application"
+  id "java-library"
+}
+
+dependencies {
+  // jetty server
+  implementation "org.eclipse.jetty:jetty-server"
+  implementation "org.eclipse.jetty:jetty-servlet"
+  // jersey dependencies
+  implementation "org.glassfish.jersey.containers:jersey-container-jdk-http"
+  implementation "org.glassfish.jersey.media:jersey-media-json-jackson"
+  implementation "org.glassfish.jersey.ext:jersey-spring5"
+  implementation "javax.servlet:javax.servlet-api"
+  // logback dependencies
+  implementation "org.slf4j:slf4j-api", "ch.qos.logback:logback-core", "ch.qos.logback:logback-classic"
+  // testing
+  testImplementation "org.junit.jupiter:junit-jupiter"
+  testImplementation "org.junit.platform:junit-platform-runner"
+  testImplementation "org.assertj:assertj-core"
+  testImplementation "io.cucumber:cucumber-java"
+  testImplementation "io.cucumber:cucumber-junit"
+  testImplementation "io.cucumber:cucumber-spring"
+  testImplementation "io.rest-assured:rest-assured"
+}
+
+test {
+  useJUnitPlatform()
+}
+
+asciidoctor {
+  sourceDir = file('doc')
+  doLast {
+    copy {
+      from 'build/asciidoc/html5'
+      into "$projectDir/src/main/resources/public/doc"
+      include 'index.html'
+    }
+  }
+}
+
+compileJava.dependsOn asciidoctor
+
+/**
+ * Configures the application to run from gradle.
+ * To add jvm args set 'applicationJvmArgs = []'.
+ */
+application {
+  mainClassName = "apycazo.codex.rest.RestApplication"
+}
+
+jar {
+  manifest {
+    attributes("Main-Class" : "apycazo.codex.rest.RestApplication")
+  }
+}
+
+test {
+  testLogging {
+    events "passed", "skipped", "failed", "standardOut", "standardError"
+  }
+}
+
+task createInfoFile() {
+  mustRunAfter compileJava
+  def dependencies = ""
+  project.getConfigurations()
+    .getByName("runtimeClasspath")
+    .resolvedConfiguration
+    .resolvedArtifacts
+    .each {dependencies += ",${it.getModuleVersion().toString()}"}
+  def content = ""
+  [
+    "service.name": project.name,
+    "service.version" : project.version,
+    "service.build.date": new Date().format("yyyy-MM-dd HH:mm:ss"),
+    "service.dependencies": dependencies.substring(1)
+  ].each {content += "${it.key} = ${it.value}\n"}
+  new File(project.projectDir, "/src/main/resources/build-info.properties")
+    .write(content.toString(), "UTF-8")
+}

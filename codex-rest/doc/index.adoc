@@ -1,0 +1,7 @@
+= Codex Rest Application documentation
+:toc: left
+:toclevels: 5
+:source-highlighter: coderay
+:icons: font
+
+include::about.adoc[]
