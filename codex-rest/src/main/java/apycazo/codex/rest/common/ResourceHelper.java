@@ -5,6 +5,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.util.Optional;
 
 public class ResourceHelper {
@@ -26,6 +27,20 @@ public class ResourceHelper {
       if (resource.exists() && resource.isFile()) {
         return Optional.of(resource);
       } else {
+        return Optional.empty();
+      }
+    }
+  }
+
+  public static Optional<File> toFile(String path) {
+    Optional<Resource> resource = toResource(path);
+    if (resource.isEmpty()) {
+      return Optional.empty();
+    } else {
+      Resource resourceValue = resource.get();
+      try {
+        return Optional.of(resourceValue.getFile());
+      } catch (Exception e) {
         return Optional.empty();
       }
     }

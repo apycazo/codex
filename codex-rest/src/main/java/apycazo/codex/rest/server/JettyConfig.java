@@ -1,5 +1,6 @@
 package apycazo.codex.rest.server;
 
+import apycazo.codex.rest.common.ResourceHelper;
 import apycazo.codex.rest.common.ServletGatewayFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +12,15 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.DispatcherType;
+import java.io.File;
+import java.security.InvalidParameterException;
 import java.util.EnumSet;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
@@ -44,11 +48,31 @@ public class JettyConfig {
 
   private void configureServerPorts(Server server) {
     HttpConfiguration httpConfig = new HttpConfiguration();
-    HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpConfig);
-    // first connector
-    ServerConnector http = new ServerConnector(server, httpConnectionFactory);
-    http.setPort(appSettings.getServerHttpPort());
-    server.setConnectors(new Connector[]{http});
+    httpConfig.setSecureScheme("https");
+    httpConfig.setSecurePort(appSettings.getServerHttpsPort());
+    // actual http config
+    if (appSettings.isHttpEnabled()) {
+      HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpConfig);
+      ServerConnector httpConnector = new ServerConnector(server, httpConnectionFactory);
+      httpConnector.setPort(appSettings.getServerHttpPort());
+      server.addConnector(httpConnector);
+    }
+    if (appSettings.isSslEnabled()) {
+      String keyStorePath = ResourceHelper.toFile(appSettings.getKeyStorePath())
+        .map(File::getAbsolutePath)
+        .orElseThrow(() -> new InvalidParameterException("Unable to resolve the keystore path"));
+      HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
+      httpsConfig.addCustomizer(new SecureRequestCustomizer());
+      SslContextFactory.Server sslServer = new SslContextFactory.Server();
+      sslServer.setKeyStorePath(keyStorePath);
+      sslServer.setKeyStorePassword(appSettings.getKeyStorePass());
+      ServerConnector httpsConnector = new ServerConnector(server,
+        new SslConnectionFactory(sslServer, "http/1.1"),
+        new HttpConnectionFactory(httpsConfig));
+      httpsConnector.setPort(appSettings.getServerHttpsPort());
+      httpsConnector.setStopTimeout(5_000);
+      server.addConnector(httpsConnector);
+    }
   }
 
   private Handler configureStaticHandler() {

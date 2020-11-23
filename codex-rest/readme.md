@@ -29,6 +29,18 @@ There is a master user password that can be used to authenticate using basic aut
 
 TODO: Store password cyphered (or at least encoded).
 
+## Test certificate
+
+Generated as `keytool -keystore dummy.jks -genkey -keyalg RSA -alias dummy-cert` with pwd: `secret007`.
+
+_Note: Using `-keyalg RSA` is important, since it is the standard required._
+
+To test SSL, include the VM options: `-Djavax.net.debug=ssl,handshake`. Including into the logger the config for
+jetty also helps:
+```xml
+<logger name="org.eclipse.jetty.server.HttpConnection" level="debug"/>
+```
+
 ## Persistence 
 
 TODO
@@ -36,7 +48,7 @@ TODO
 ## Others
 
 * ✔ CORS support.
-* SSL support.
+* ✔ SSL support.
 * ✔ Documentation (asciidoc).
 * ✔ Service properties (gradle build info).
 * Persistence (h2 database)

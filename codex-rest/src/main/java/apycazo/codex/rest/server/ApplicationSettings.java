@@ -8,6 +8,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,21 @@ public class ApplicationSettings {
   @Value("${features.security.cors.allowed:*}")
   private Set<String> corsAllowed;
 
+  // ssl config
+  @Value("${features.ssl.keystore.path:}")
+  private String keyStorePath;
+  @Value("${features.ssl.keystore.pass:}")
+  private String keyStorePass;
+
   private final Map<String, Object> jettyProperties;
+
+  public boolean isHttpEnabled() {
+    return serverHttpPort >= 0;
+  }
+
+  public boolean isSslEnabled() {
+    return serverHttpsPort >= 0 && !StringUtils.isEmpty(keyStorePath) && !StringUtils.isEmpty(keyStorePass);
+  }
 
   public ApplicationSettings(Environment environment) {
     jettyProperties = new HashMap<>();
