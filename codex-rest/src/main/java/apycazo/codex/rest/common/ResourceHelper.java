@@ -1,5 +1,7 @@
 package apycazo.codex.rest.common;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -8,8 +10,10 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.util.Optional;
 
+@Slf4j
 public class ResourceHelper {
 
+  @SneakyThrows
   public static Optional<Resource> toResource(String path) {
     if (StringUtils.isEmpty(path)) {
       return Optional.empty();
@@ -27,6 +31,7 @@ public class ResourceHelper {
       if (resource.exists() && resource.isFile()) {
         return Optional.of(resource);
       } else {
+        log.warn("Resource {} not file or not exists", resource.getFile().getPath());
         return Optional.empty();
       }
     }
@@ -41,6 +46,7 @@ public class ResourceHelper {
       try {
         return Optional.of(resourceValue.getFile());
       } catch (Exception e) {
+        log.warn("toFile with path '{}' failed", path, e);
         return Optional.empty();
       }
     }

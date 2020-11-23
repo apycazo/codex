@@ -1,6 +1,5 @@
 package apycazo.codex.rest.server;
 
-import apycazo.codex.rest.common.ResourceHelper;
 import apycazo.codex.rest.common.ServletGatewayFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,6 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.DispatcherType;
-import java.io.File;
-import java.security.InvalidParameterException;
 import java.util.EnumSet;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
@@ -37,7 +34,6 @@ public class JettyConfig {
   public Server getServer() {
     Server server = new Server();
     configureServerPorts(server);
-    // --- create the handler list (note: the order is relevant).
     HandlerList handlers = new HandlerList();
     handlers.addHandler(configureJerseyHandler());
     handlers.addHandler(configureStaticHandler());
@@ -50,7 +46,6 @@ public class JettyConfig {
     HttpConfiguration httpConfig = new HttpConfiguration();
     httpConfig.setSecureScheme("https");
     httpConfig.setSecurePort(appSettings.getServerHttpsPort());
-    // actual http config
     if (appSettings.isHttpEnabled()) {
       HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpConfig);
       ServerConnector httpConnector = new ServerConnector(server, httpConnectionFactory);
@@ -58,13 +53,23 @@ public class JettyConfig {
       server.addConnector(httpConnector);
     }
     if (appSettings.isSslEnabled()) {
-      String keyStorePath = ResourceHelper.toFile(appSettings.getKeyStorePath())
-        .map(File::getAbsolutePath)
-        .orElseThrow(() -> new InvalidParameterException("Unable to resolve the keystore path"));
       HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
       httpsConfig.addCustomizer(new SecureRequestCustomizer());
       SslContextFactory.Server sslServer = new SslContextFactory.Server();
-      sslServer.setKeyStorePath(keyStorePath);
+      String certLocation = appSettings.getKeyStorePath();
+      Resource sslCertResource;
+      try {
+        if (certLocation.startsWith("classpath:")) {
+          certLocation = certLocation.substring("classpath:".length());
+          sslCertResource = Resource.newClassPathResource(certLocation);
+        } else {
+          sslCertResource = Resource.newResource(certLocation);
+        }
+        sslServer.setKeyStoreResource(sslCertResource);
+      } catch (Exception e) {
+        log.error("Failed to start SSL", e);
+        return;
+      }
       sslServer.setKeyStorePassword(appSettings.getKeyStorePass());
       ServerConnector httpsConnector = new ServerConnector(server,
         new SslConnectionFactory(sslServer, "http/1.1"),
