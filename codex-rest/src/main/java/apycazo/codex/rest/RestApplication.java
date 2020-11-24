@@ -13,28 +13,28 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.RequestContextFilter;
 
-import java.util.function.Consumer;
-
 @Slf4j
 public class RestApplication {
 
   private static final String baseScanPath = RestApplication.class.getPackageName();
+  private final Server server;
 
   public static void main(String[] args) throws Exception {
-    new RestApplication().configureServer().start();
+    initServer().start();
   }
 
-  /**
-   * Configures the application with the provided property locations exclusively
-   * (this does not register the default locations).
-   */
+  public static Server initServer() {
+    return new RestApplication().getServer();
+  }
+
   public RestApplication() {
-    springContext = createSpringContext();
-    appSettings = springContext.getBean(ApplicationSettings.class);
-    resourceConfig = createResourceConfig();
+    WebApplicationContext springContext = createSpringContext();
+    ApplicationSettings appSettings = springContext.getBean(ApplicationSettings.class);
+    ResourceConfig resourceConfig = createResourceConfig(appSettings);
+    server = new JettyConfig(resourceConfig, springContext, appSettings).getServer();
   }
 
-  public ResourceConfig createResourceConfig() {
+  private ResourceConfig createResourceConfig(ApplicationSettings appSettings) {
     ResourceConfig resourceConfig = new ResourceConfig();
     resourceConfig.packages(baseScanPath);
     // binds http requests to service threads
@@ -64,36 +64,8 @@ public class RestApplication {
     return context;
   }
 
-  public RestApplication configureResourceConfig(Consumer<ResourceConfig> config) {
-    if (config != null) {
-      config.accept(resourceConfig);
-    }
-    return this;
-  }
-
-  public RestApplication configureSpringContext(Consumer<WebApplicationContext> config) {
-    if (config != null) {
-      config.accept(springContext);
-    }
-    return this;
-  }
-
-  public RestApplication configureProperties(Consumer<ApplicationSettings> config) {
-    if (config != null) {
-      config.accept(appSettings);
-    }
-    return this;
-  }
-
-  public Server configureServer() {
-    if (server == null) {
-      server = new JettyConfig(resourceConfig, springContext, appSettings).getServer();
-    }
+  public Server getServer() {
     return server;
   }
 
-  private final ResourceConfig resourceConfig;
-  private final WebApplicationContext springContext;
-  private final ApplicationSettings appSettings;
-  private Server server;
 }
