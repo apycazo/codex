@@ -1,4 +1,4 @@
 dependencies {
   implementation springStarter, logback
-  implementation "org.yaml:snakeyaml:1.27"
+  implementation "org.yaml:snakeyaml"
 }
