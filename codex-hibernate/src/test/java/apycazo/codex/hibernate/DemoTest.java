@@ -10,6 +10,10 @@ import org.junit.runner.RunWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,5 +67,27 @@ public class DemoTest {
     teamRepository.remove(team);
     assertThat(teamRepository.find()).isEmpty();
     assertThat(playerRepository.find()).isEmpty();
+  }
+
+  @Test
+  void custom_query_find_players_by_team() {
+    TeamRepository teamRepository = ctx.getBean(TeamRepository.class);
+    CustomRequestRepository repository = ctx.getBean(CustomRequestRepository.class);
+    // --- create red/blue teams
+    Stream.of("red", "blue").forEach(color -> {
+      Team team = Team.instance(color);
+      Player p1 = Player.instance(color + "-1", team);
+      Player p2 = Player.instance(color + "-2", team);
+      team.setPlayers(Arrays.asList(p1, p2));
+      teamRepository.saveOrUpdate(team);
+    });
+    // --- find all players from blue team
+    List<Player> bluePlayers = repository.getPlayersFromTeam("blue");
+    assertThat(bluePlayers).isNotNull();
+    assertThat(bluePlayers.size()).isEqualTo(2);
+    Set<String> playerHandlers = bluePlayers.stream()
+      .map(player -> player.getName() + "|" + player.getTeam().getName())
+      .collect(Collectors.toSet());
+    assertThat(playerHandlers).containsAll(Arrays.asList("blue-1|blue", "blue-2|blue"));
   }
 }

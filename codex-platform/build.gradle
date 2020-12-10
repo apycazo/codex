@@ -45,18 +45,14 @@ dependencies {
       "org.springframework:spring-web:$springVersion",
       "org.springframework:spring-jdbc:$springVersion",
       "org.springframework:spring-orm:$springVersion",
-      "org.springframework:spring-tx:$springVersion"
+      "org.springframework:spring-tx:$springVersion",
+      "org.springframework.data:spring-data-jpa:$springDataVersion"
     )
     api( // --- persistence
       "org.hibernate:hibernate-core:$hibernate",
       "mysql:mysql-connector-java:$mysqlConnector",
       "org.apache.commons:commons-dbcp2:$dbcp2",
       "com.h2database:h2:$h2db"
-    )
-    api( // --- graphql
-      "com.graphql-java:graphql-java:$graphql",
-      "com.graphql-java:graphql-java-tools:$graphqlTools",
-      "com.graphql-java:graphql-java-annotations:$graphqlAnnotations",
     )
     api( // --- test frameworks
       "org.assertj:assertj-core:$assertjVersion",

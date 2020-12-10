@@ -18,8 +18,11 @@ import java.util.Properties;
 public class SpringPersistenceConfig {
 
   @Bean(destroyMethod = "close")
-  public DataSource dataSource(@Value("${db.driver}") String driver, @Value("${db.url}") String url,
-                               @Value("${db.usr}") String usr, @Value("${db.pwd}") String pwd) {
+  public DataSource dataSource(
+    @Value("${db.driver}") String driver,
+    @Value("${db.url}") String url,
+    @Value("${db.usr}") String usr,
+    @Value("${db.pwd}") String pwd) {
     BasicDataSource datasource = new BasicDataSource();
     datasource.setDriverClassName(driver);
     datasource.setUrl(url);
@@ -29,10 +32,11 @@ public class SpringPersistenceConfig {
   }
 
   @Bean
-  public LocalSessionFactoryBean sessionFactory(DataSource dataSource,
-      @Value("${hibernate.show_sql:false}") String showSql,
-      @Value("${hibernate.hbm2ddl.auto:create-drop}") String auto,
-      @Value("${hibernate.dialect:org.hibernate.dialect.MySQL5Dialect}") String dialect) {
+  public LocalSessionFactoryBean sessionFactory(
+    DataSource dataSource,
+    @Value("${hibernate.show_sql:false}") String showSql,
+    @Value("${hibernate.hbm2ddl.auto:create-drop}") String auto,
+    @Value("${hibernate.dialect:org.hibernate.dialect.MySQL5Dialect}") String dialect) {
     LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
     sessionFactory.setDataSource(dataSource);
     sessionFactory.setPackagesToScan(BasicUserEntity.class.getPackageName());
