@@ -1,6 +1,5 @@
-package apycazo.codex.hibernate;
+package apycazo.codex.hibernate.demo;
 
-import apycazo.codex.hibernate.demo.*;
 import apycazo.codex.hibernate.spring.SpringPersistenceConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JUnitPlatform.class)
-public class DemoTest {
+public class DataDemoAppTest {
 
   private static AnnotationConfigApplicationContext ctx;
 

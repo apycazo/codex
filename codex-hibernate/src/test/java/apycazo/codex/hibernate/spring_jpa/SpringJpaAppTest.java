@@ -111,4 +111,12 @@ class SpringJpaAppTest {
     savedCollection = collectionById.get();
     assertThat(savedCollection.getItems().size()).isEqualTo(5);
   }
+
+  @Test
+  void open_projection_method() {
+    itemRepository.save(ItemEntity.withValues("test", 10));
+    ItemName item = itemRepository.findByValue(10);
+    assertThat(item).isNotNull();
+    assertThat(item.getIdWithName()).isEqualTo("1-test");
+  }
 }
