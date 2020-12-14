@@ -12,4 +12,5 @@ dependencies {
   implementation "com.h2database:h2"
   // --- extras
   implementation logback + testing
+  testImplementation "org.springframework:spring-test"
 }

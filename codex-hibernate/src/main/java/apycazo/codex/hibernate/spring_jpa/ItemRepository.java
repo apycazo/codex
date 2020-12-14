@@ -15,4 +15,7 @@ public interface ItemRepository extends CrudRepository<ItemEntity, Integer> {
   ItemEntity findItemWithValue(int value);
 
   int countByValueLessThan(int value);
+
+  // projection: get only names
+  ItemName findByValue(int value);
 }

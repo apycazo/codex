@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -32,11 +33,16 @@ import java.util.Properties;
 public class SpringJpaApp {
 
   public static void main(String[] args) {
+    ConfigurableApplicationContext ctx = init();
+    SpringJpaDemoService service = ctx.getBean(SpringJpaDemoService.class);
+    service.runDemo();
+  }
+
+  public static ConfigurableApplicationContext init() {
     AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
     ctx.register(SpringJpaApp.class);
     ctx.refresh();
-    SpringJpaDemoService service = ctx.getBean(SpringJpaDemoService.class);
-    service.runDemo();
+    return ctx;
   }
 
   @Bean(destroyMethod = "close")

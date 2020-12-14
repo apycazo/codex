@@ -14,4 +14,11 @@ public class ItemEntity {
   private int id;
   private String name;
   private int value;
+
+  public static ItemEntity withValues(String name, int value) {
+    ItemEntity itemEntity = new ItemEntity();
+    itemEntity.setName(name);
+    itemEntity.setValue(value);
+    return itemEntity;
+  }
 }
