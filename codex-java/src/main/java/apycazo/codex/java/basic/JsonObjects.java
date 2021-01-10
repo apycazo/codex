@@ -1,15 +1,11 @@
 package apycazo.codex.java.basic;
 
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StringSerializer;
-import io.cucumber.datatable.dependency.com.fasterxml.jackson.annotation.JsonIgnore;
-import io.cucumber.datatable.dependency.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.cucumber.datatable.dependency.com.fasterxml.jackson.annotation.JsonInclude;
-import io.cucumber.datatable.dependency.com.fasterxml.jackson.annotation.JsonProperty;
-import io.cucumber.datatable.dependency.com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

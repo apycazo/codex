@@ -19,6 +19,14 @@ import java.util.Set;
 @Component
 public class ApplicationSettings {
 
+  // build info
+  @Value("${service.name:}")
+  private String serviceName;
+  @Value("${service.version:}")
+  private String serviceVersion;
+  @Value("${service.build.date:}")
+  private String serviceBuildDate;
+
   // core config
   @Value("${server.http.port:8080}")
   private int serverHttpPort;

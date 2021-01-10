@@ -19,16 +19,12 @@ dependencies {
   implementation "org.slf4j:slf4j-api", "ch.qos.logback:logback-core", "ch.qos.logback:logback-classic"
   // testing
   testImplementation "org.junit.jupiter:junit-jupiter"
+  testImplementation "org.junit.vintage:junit-vintage-engine" // required for the cucumber-junit-tests
   testImplementation "org.junit.platform:junit-platform-runner"
   testImplementation "org.assertj:assertj-core"
   testImplementation "io.cucumber:cucumber-java"
-  testImplementation "io.cucumber:cucumber-junit"
-  testImplementation "io.cucumber:cucumber-spring"
+  testImplementation "io.cucumber:cucumber-junit" // required to use cucumber with junit
   testImplementation "io.rest-assured:rest-assured"
-}
-
-test {
-  useJUnitPlatform()
 }
 
 asciidoctor {
@@ -64,6 +60,11 @@ test {
   }
 }
 
+/**
+ * Creates an info file with build data after each java compilation.
+ * This file contains similar info to the manifest.mf file, but is easier
+ * to access from spring, and avoids confusing it with other manifests.
+ */
 task createInfoFile() {
   mustRunAfter compileJava
   def dependencies = ""

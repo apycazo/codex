@@ -19,14 +19,28 @@ public class RestApplication {
   private static final String baseScanPath = RestApplication.class.getPackageName();
   private final Server server;
 
+  /**
+   * When used as a standalone application, initializes & starts the server.
+   * @param args the arguments to process (no argument is required right now).
+   * @throws Exception on init server failures.
+   */
   public static void main(String[] args) throws Exception {
     initServer().start();
   }
 
+  /**
+   * Creates a new server and returns the configured instance (without starting it).
+   * @return the initialized server instance.
+   */
   public static Server initServer() {
     return new RestApplication().getServer();
   }
 
+  /**
+   * Creates a new server instance, including the spring context, and taking application settings from the
+   * initialized spring context (bean: ApplicationSettings). Creates the resource configuration using the
+   * settings read from the bean, which in turns uses the spring-parsed property files.
+   */
   public RestApplication() {
     WebApplicationContext springContext = createSpringContext();
     ApplicationSettings appSettings = springContext.getBean(ApplicationSettings.class);
@@ -64,6 +78,10 @@ public class RestApplication {
     return context;
   }
 
+  /**
+   * Returns the configured Jetty server instance (if any).
+   * @return the server instance.
+   */
   public Server getServer() {
     return server;
   }

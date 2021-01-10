@@ -19,10 +19,14 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
+import java.util.Map;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
 
+/**
+ * Configures a Jetty server instance. The server configuration is taken from the <code>ApplicationSettings</code> bean.
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class JettyConfig {
@@ -30,6 +34,12 @@ public class JettyConfig {
   private final ResourceConfig resourceConfig;
   private final WebApplicationContext springContext;
   private final ApplicationSettings appSettings;
+  // --- constants
+  public static final String JETTY_OUTPUT_BUFFER_SIZE = "jetty.output.buffer.size";
+  public static final String JETTY_REQUEST_HEADER_SIZE = "jetty.request.header.size";
+  public static final String JETTY_RESPONSE_HEADER_SIZE = "jetty.response.header.size";
+  public static final String JETTY_SEND_SERVER_VERSION = "jetty.send.server.version";
+  public static final String JETTY_SEND_DATE_HEADER = "jetty.send.date.header";
 
   public Server getServer() {
     Server server = new Server();
@@ -44,6 +54,27 @@ public class JettyConfig {
 
   private void configureServerPorts(Server server) {
     HttpConfiguration httpConfig = new HttpConfiguration();
+    Map<String, Object> jettyProperties = appSettings.getJettyProperties();
+    jettyProperties.keySet().forEach(key -> {
+      String value = jettyProperties.get(key).toString();
+      switch (key) {
+        case JETTY_OUTPUT_BUFFER_SIZE:
+          httpConfig.setOutputBufferSize(Integer.parseInt(value));
+          break;
+        case JETTY_REQUEST_HEADER_SIZE:
+          httpConfig.setRequestHeaderSize(Integer.parseInt(value));
+          break;
+        case JETTY_RESPONSE_HEADER_SIZE:
+          httpConfig.setResponseHeaderSize(Integer.parseInt(value));
+          break;
+        case JETTY_SEND_SERVER_VERSION:
+          httpConfig.setSendServerVersion(Boolean.parseBoolean(value));
+          break;
+        case JETTY_SEND_DATE_HEADER:
+          httpConfig.setSendDateHeader(Boolean.parseBoolean(value));
+          break;
+      }
+    });
     httpConfig.setSecureScheme("https");
     httpConfig.setSecurePort(appSettings.getServerHttpsPort());
     if (appSettings.isHttpEnabled()) {
@@ -91,6 +122,11 @@ public class JettyConfig {
     return contextHandler;
   }
 
+  /**
+   * Configures a servlet holder for the Jersey resource config instance. The resource config is taken from the
+   * constructor param.
+   * @return the configured Jersey handler (a <code>ServletContextHandler</code> instance).
+   */
   private Handler configureJerseyHandler() {
     final int options = appSettings.isStateless() ? NO_SESSIONS : SESSIONS;
     ServletContextHandler servletContextHandler = new ServletContextHandler(options);

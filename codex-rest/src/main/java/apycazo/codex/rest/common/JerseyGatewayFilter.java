@@ -6,7 +6,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
-import java.io.IOException;
 import java.lang.reflect.Method;
 
 public class JerseyGatewayFilter implements ContainerRequestFilter {
@@ -21,7 +20,7 @@ public class JerseyGatewayFilter implements ContainerRequestFilter {
   }
 
   @Override
-  public void filter(ContainerRequestContext requestContext) throws IOException {
+  public void filter(ContainerRequestContext requestContext) {
     Class<?> resourceClass = resourceInfo.getResourceClass();
     Method resourceMethod = resourceInfo.getResourceMethod();
     String operation = resourceClass.getSimpleName() + ":" + resourceMethod.getName();

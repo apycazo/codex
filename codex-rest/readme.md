@@ -1,6 +1,6 @@
 # Codex-Rest
 
-This is a sample rest service to be used as a feature demo. Obviously APIS do not required everything here, but should 
+This is a sample rest service to be used as a feature demo. Obviously APIs do not required everything here, but should 
 work as a demo.
 
 ## Servlets

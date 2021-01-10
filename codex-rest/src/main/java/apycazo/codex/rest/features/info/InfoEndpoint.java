@@ -19,5 +19,4 @@ public class InfoEndpoint {
     log.info("Received request");
     return Map.of("info", "true");
   }
-
 }

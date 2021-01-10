@@ -6,7 +6,7 @@
       <pattern>${CONSOLE_LOG_PATTERN}</pattern>
     </encoder>
   </appender>
-  <!--  set to debug to check for connection errors-->
+  <!--  set to debug to check for connection errors -->
   <logger name="org.eclipse.jetty.server.HttpConnection" level="info"/>
   <root level="INFO">
     <appender-ref ref="CONSOLE" />

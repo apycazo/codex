@@ -7,6 +7,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 @Configuration
+@PropertySource(value = "classpath:build-info.properties")
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:application.properties", ignoreResourceNotFound = true)
 public class SpringConfig {

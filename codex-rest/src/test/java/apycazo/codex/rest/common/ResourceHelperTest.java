@@ -1,6 +1,8 @@
 package apycazo.codex.rest.common;
 
 import org.junit.jupiter.api.Test;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -8,6 +10,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@RunWith(JUnitPlatform.class)
 class ResourceHelperTest {
 
   @Test

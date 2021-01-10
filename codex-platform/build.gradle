@@ -57,6 +57,7 @@ dependencies {
     api( // --- test frameworks
       "org.assertj:assertj-core:$assertjVersion",
       "io.cucumber:cucumber-java:$cucumberVersion",
+      "io.cucumber:cucumber-java8:$cucumberVersion",
       "io.cucumber:cucumber-junit:$cucumberVersion",
       "io.cucumber:cucumber-spring:$cucumberVersion",
       "io.rest-assured:rest-assured:$restAssuredVersion",

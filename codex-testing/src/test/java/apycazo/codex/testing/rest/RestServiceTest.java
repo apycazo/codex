@@ -37,5 +37,4 @@ class RestServiceTest {
       .statusCode(200)
       .body("0", equalTo("zero"));
   }
-
 }

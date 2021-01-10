@@ -15,7 +15,7 @@ public class ResourceHelper {
 
   @SneakyThrows
   public static Optional<Resource> toResource(String path) {
-    if (StringUtils.isEmpty(path)) {
+    if (!StringUtils.hasLength(path)) {
       return Optional.empty();
     } else {
       Resource resource;
@@ -31,7 +31,7 @@ public class ResourceHelper {
       if (resource.exists() && resource.isFile()) {
         return Optional.of(resource);
       } else {
-        log.warn("Resource {} not file or not exists", resource.getFile().getPath());
+        log.warn("Resource {} is not a file or does not exist", resource.getFile().getPath());
         return Optional.empty();
       }
     }
