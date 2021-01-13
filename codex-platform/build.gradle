@@ -72,7 +72,9 @@ dependencies {
       "io.github.classgraph:classgraph:$classGraphVersion",
       "info.picocli:picocli:$picocli",
       "info.picocli:picocli-codegen:$picocli",
-      "io.github.openfeign.form:feign-form:$feignFormVersion"
+      "io.github.openfeign.form:feign-form:$feignFormVersion",
+      "com.github.ben-manes.caffeine:caffeine:$caffeine"
+
     )
   }
 }

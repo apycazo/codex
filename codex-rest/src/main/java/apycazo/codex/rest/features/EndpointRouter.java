@@ -1,5 +1,6 @@
 package apycazo.codex.rest.features;
 
+import apycazo.codex.rest.features.cached.CachedEndpoint;
 import apycazo.codex.rest.features.datamap.DataMapEndpoint;
 import apycazo.codex.rest.features.info.InfoEndpoint;
 import apycazo.codex.rest.server.ApplicationSettings;
@@ -46,5 +47,10 @@ public class EndpointRouter {
   @Path("datamap")
   public DataMapEndpoint dataMapEndpoint() {
     return context.getResource(DataMapEndpoint.class);
+  }
+
+  @Path("cache")
+  public CachedEndpoint cachedEndpoint() {
+    return context.getResource(CachedEndpoint.class);
   }
 }
