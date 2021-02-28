@@ -1,6 +1,7 @@
 package apycazo.codex.rest.cucumber;
 
 import apycazo.codex.rest.RestApplication;
+import apycazo.codex.rest.common.data.Pair;
 import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -26,6 +27,7 @@ public class HttpSteps {
   private int port;
   private ValidatableResponse response;
   private String content;
+  private Pair<String, String> credentials;
   private final Map<String, String> headers = new HashMap<>();
   private final Map<String, String> store = new HashMap<>();
 
@@ -33,11 +35,26 @@ public class HttpSteps {
   public void initial_condition() throws Exception {
     response = null;
     content = null;
+    credentials = null;
     headers.clear();
     store.clear();
     server = RestApplication.initServer();
     server.start();
     port = server.getURI().getPort();
+  }
+
+  @Given("a clear status")
+  public void clear_status() {
+    response = null;
+    content = null;
+    credentials = null;
+    headers.clear();
+    store.clear();
+  }
+
+  @Given("basic auth user {string} and password {string}")
+  public void basic_auth_credentials(String user, String pass) {
+    credentials = Pair.of(user, pass);
   }
 
   @Given("header {string} with value {string}")
@@ -61,7 +78,7 @@ public class HttpSteps {
     response = given()
       .port(port)
       .when()
-      .get("api/datamap")
+      .get("api/crud")
       .then()
       .log().all();
   }
@@ -70,9 +87,15 @@ public class HttpSteps {
   public void a_request_is_sent(String verb, String requestPath) {
     String path = resolveString(requestPath);
     RequestSpecification request = given().port(port).headers(headers).log().all().when();
+    if (credentials != null) {
+      request.given().auth().preemptive().basic(credentials.getKey(), credentials.getValue());
+    }
     switch (verb.toUpperCase()) {
       case "GET":
         response = request.get(path).then().log().all();
+        break;
+      case "DELETE":
+        response = request.delete(path).then().log().all();
         break;
       case "POST":
         if (content != null) {
@@ -80,6 +103,14 @@ public class HttpSteps {
           content = null;
         } else {
           response = request.post(path).then().log().all();
+        }
+        break;
+      case "PUT":
+        if (content != null) {
+          response = request.given().body(content).put(path).then().log().all();
+          content = null;
+        } else {
+          response = request.put(path).then().log().all();
         }
         break;
       default:

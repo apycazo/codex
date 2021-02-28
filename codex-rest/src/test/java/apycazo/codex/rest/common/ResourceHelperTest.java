@@ -1,5 +1,6 @@
 package apycazo.codex.rest.common;
 
+import apycazo.codex.rest.common.util.ResourceHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;

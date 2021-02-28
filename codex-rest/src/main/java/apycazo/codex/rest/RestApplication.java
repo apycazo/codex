@@ -1,10 +1,10 @@
 package apycazo.codex.rest;
 
-import apycazo.codex.rest.common.CrossDomainFilter;
-import apycazo.codex.rest.security.SecurityFilter;
-import apycazo.codex.rest.server.ApplicationSettings;
-import apycazo.codex.rest.server.JettyConfig;
-import apycazo.codex.rest.server.SpringConfig;
+import apycazo.codex.rest.common.filter.CrossDomainFilter;
+import apycazo.codex.rest.common.security.SecurityFilter;
+import apycazo.codex.rest.common.server.ApplicationSettings;
+import apycazo.codex.rest.common.server.JettyConfig;
+import apycazo.codex.rest.common.server.SpringConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.server.ResourceConfig;
