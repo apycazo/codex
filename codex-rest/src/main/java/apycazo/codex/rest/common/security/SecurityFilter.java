@@ -47,10 +47,10 @@ public class SecurityFilter implements ContainerRequestFilter {
       Set<SecurityRole> roleSet = new HashSet<>();
       Optional // adds class-level annotation roles
         .ofNullable(resourceInfo.getResourceClass().getAnnotation(Authenticated.class))
-        .ifPresent(annotation -> roleSet.addAll(Arrays.asList(annotation.allowedForRoles())));
+        .ifPresent(annotation -> roleSet.addAll(Arrays.asList(annotation.rolesAllowed())));
       Optional // adds method-level annotation roles
         .ofNullable(resourceInfo.getResourceMethod().getAnnotation(Authenticated.class))
-        .ifPresent(annotation -> roleSet.addAll(Arrays.asList(annotation.allowedForRoles())));
+        .ifPresent(annotation -> roleSet.addAll(Arrays.asList(annotation.rolesAllowed())));
       if (!roleSet.isEmpty() && roleSet.stream().noneMatch(role -> securityContext.isUserInRole(role.name()))) {
         requestContext.abortWith(Response.status(FORBIDDEN).build());
       }

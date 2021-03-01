@@ -1,8 +1,5 @@
 package apycazo.codex.rest.common.server;
 
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -10,7 +7,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 @Configuration
-@EnableCaching
 @PropertySource(value = "classpath:build-info.properties")
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:application.properties", ignoreResourceNotFound = true)
@@ -35,8 +31,4 @@ public class SpringConfig {
     return new DefaultConversionService();
   }
 
-  @Bean
-  public CacheManager cacheManager() {
-    return new ConcurrentMapCacheManager("default");
-  }
 }

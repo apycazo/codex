@@ -16,7 +16,7 @@ public class SecuredEndpoint {
   @GET
   @Path("admin")
   @Produces(MediaType.APPLICATION_JSON)
-  @Authenticated(allowedForRoles = SecurityRole.ADMIN)
+  @Authenticated(rolesAllowed = SecurityRole.ADMIN)
   public Map<String, Object> adminOnly() {
     return Map.of("admin", SecuredEndpoint.class.getSimpleName());
   }
@@ -24,7 +24,7 @@ public class SecuredEndpoint {
   @GET
   @Path("user")
   @Produces(MediaType.APPLICATION_JSON)
-  @Authenticated(allowedForRoles = SecurityRole.USER)
+  @Authenticated(rolesAllowed = SecurityRole.USER)
   public Map<String, Object> userAllowed() {
     return Map.of("user", SecuredEndpoint.class.getSimpleName());
   }
