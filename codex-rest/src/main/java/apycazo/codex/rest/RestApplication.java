@@ -9,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.internal.JerseyResourceContext;
+import org.glassfish.jersey.server.spring.scope.RequestContextFilter;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.RequestContextFilter;
 
 @Slf4j
 public class RestApplication {
@@ -51,7 +51,7 @@ public class RestApplication {
   private ResourceConfig createResourceConfig(ApplicationSettings appSettings) {
     ResourceConfig resourceConfig = new ResourceConfig();
     resourceConfig.packages(baseScanPath);
-    // binds http requests to service threads
+    // binds http requests to service threads (Important! use the jersey class, not the spring one)
     resourceConfig.register(RequestContextFilter.class);
     // jersey implementation of resource context
     resourceConfig.register(JerseyResourceContext.class);

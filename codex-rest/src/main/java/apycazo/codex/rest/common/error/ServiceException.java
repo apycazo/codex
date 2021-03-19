@@ -3,7 +3,7 @@ package apycazo.codex.rest.common.error;
 import lombok.Getter;
 import org.slf4j.MDC;
 
-import static apycazo.codex.rest.common.filter.ServletGatewayFilter.REQUEST_ID;
+import static apycazo.codex.rest.common.filter.RequestFilter.MDC_REQUEST_ID_KEY;
 
 public class ServiceException extends RuntimeException {
 
@@ -26,7 +26,7 @@ public class ServiceException extends RuntimeException {
   }
 
   private void initErrorInfo(String msg, int code) {
-    String requestId = MDC.get(REQUEST_ID);
+    String requestId = MDC.get(MDC_REQUEST_ID_KEY);
     errorInfo = ErrorInfo.builder().message(msg).errorCode(code).requestId(requestId).build();
   }
 }

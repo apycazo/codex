@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <property name="CONSOLE_LOG_PATTERN" value="%d %-5p %logger [%X{x-request-id:000000000000}] - %msg%n%xEx"/>
+  <property name="CONSOLE_LOG_PATTERN" value="%d %5p [%X{x-request-id:-000000000000}] %30.30c -- %msg%n%xEx"/>
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>${CONSOLE_LOG_PATTERN}</pattern>

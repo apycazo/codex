@@ -37,7 +37,9 @@ public class SpringJerseyDemo {
     servletContextHandler.setContextPath("/");
     server.setHandler(servletContextHandler);
     // --- configure resource
-    ServletHolder servletHolder = new ServletHolder(new ServletContainer(new JerseyConfig()));
+    // use this when JerseyConfig is not annotated with @Component
+    // ServletHolder servletHolder = new ServletHolder(new ServletContainer(new JerseyConfig()));
+    ServletHolder servletHolder = new ServletHolder(new ServletContainer());
     servletHolder.setInitOrder(0);
     servletContextHandler.addServlet(servletHolder, "/*");
     // --- add spring support

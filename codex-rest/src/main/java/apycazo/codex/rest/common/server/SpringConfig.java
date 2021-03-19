@@ -1,12 +1,15 @@
 package apycazo.codex.rest.common.server;
 
+import apycazo.codex.rest.common.filter.RequestExtraData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 @Configuration
+@Import(RequestExtraData.class)
 @PropertySource(value = "classpath:build-info.properties")
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:application.properties", ignoreResourceNotFound = true)

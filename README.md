@@ -14,7 +14,7 @@ This is a reference code library for multiple libraries, see the contents below.
 + **codex-jetty**: jetty server example.  
 + **codex-kotlin**: language references for kotlin.
 + **codex-micronaut**: rest API using the micronaut framework.
-+ **codex-minion**: [legacy] a lab project on how to implement dependency injection.
++ **codex-minion**: [_legacy_] a lab project on how to implement dependency injection.
 + **codex-picocli**: command line example with PicoCLI.
 + **codex-platform**: project-wide gradle platform (BOM) for dependency management.
 + **codex-rest**: rest service implementation.
@@ -42,3 +42,8 @@ implementation platform("io.micronaut:micronaut-bom:2.0.0.M2")
 implementation platform("io.spring.platform:platform-bom:Cairo-SR8")
 ```
 
+## TODO
+
+- Validation API
+- OAuth2
+- API gateway + security.

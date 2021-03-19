@@ -7,7 +7,6 @@ public class JavaUsingKotlin {
 
   public static void main(String[] args) {
     DataModel dm = new DataModel("john", 30);
-
+    log.info("DM: {}", dm);
   }
-
 }

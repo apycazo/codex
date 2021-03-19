@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringValueResolver;
 
 /**
- * Shows how to resolve properties from existing values (for example, resolving random, or cyphered values.
+ * Shows how to resolve properties from existing values (for example, resolving random, or cyphered values).
  */
 @Slf4j
 @Configuration
