@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ResourceInfo;
 import java.util.Optional;
 
@@ -15,7 +14,6 @@ public class RequestFilter {
   public static final String HEADER_REQUEST_ID = "x-request-id";
   public static final String MDC_REQUEST_ID_KEY = HEADER_REQUEST_ID;
   public static final String MDC_OPERATION_KEY = "x-operation";
-  public static final String ATTRIBUTE_HANDLED = "is-handled";
   public static final String SYSTEM = "system";
 
   protected void accept(HttpServletRequest request) {
@@ -38,13 +36,5 @@ public class RequestFilter {
       .map(v -> v.getResourceClass().getName() + "::" + v.getResourceMethod().getName())
       .orElse(SYSTEM);
     MDC.put(MDC_OPERATION_KEY, operationName);
-  }
-
-  protected void complete(HttpServletRequest request, HttpServletResponse response) {
-    if (request.getAttribute(ATTRIBUTE_HANDLED) == null) {
-      request.setAttribute(ATTRIBUTE_HANDLED, true);
-      log.info("Result {} for {} ({})", response.getStatus(), request.getRequestURI(), MDC.get(MDC_REQUEST_ID_KEY));
-    }
-    MDC.clear();
   }
 }

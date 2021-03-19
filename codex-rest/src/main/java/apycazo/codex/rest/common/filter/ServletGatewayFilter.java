@@ -32,7 +32,7 @@ public class ServletGatewayFilter extends RequestFilter implements Filter {
     }
     // continue the filter chain
     chain.doFilter(request, response);
-    // clear the MDC when done
+    // clear the MDC when done (duplicate for jersey requests, but it is safer this way).
     MDC.clear();
   }
 }

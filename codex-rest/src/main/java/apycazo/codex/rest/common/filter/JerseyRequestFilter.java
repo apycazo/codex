@@ -1,16 +1,18 @@
 package apycazo.codex.rest.common.filter;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+@Slf4j
 @Provider
 public class JerseyRequestFilter extends RequestFilter implements ContainerRequestFilter, ContainerResponseFilter {
-
-  public static final String METHOD_KEY = "x-method-id";
-  public static final String METHOD_SYSTEM = "system";
 
   private final ResourceInfo resourceInfo;
   private final RequestExtraData requestExtraData;
@@ -33,6 +35,7 @@ public class JerseyRequestFilter extends RequestFilter implements ContainerReque
   @Override
   public void filter(ContainerRequestContext requestContext) {
     accept(httpServletRequest, requestExtraData, resourceInfo);
+    httpServletResponse.setHeader(HEADER_REQUEST_ID, requestExtraData.getRequestId());
   }
 
   /**
@@ -42,6 +45,9 @@ public class JerseyRequestFilter extends RequestFilter implements ContainerReque
    */
   @Override
   public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-    complete(httpServletRequest, httpServletResponse);
+    Response.StatusType statusInfo = responseContext.getStatusInfo();
+    String uri = httpServletRequest.getRequestURI();
+    log.info("{} {} for {}", statusInfo.getStatusCode(), statusInfo.getReasonPhrase(), uri);
+    MDC.clear();
   }
 }
