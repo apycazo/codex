@@ -1,0 +1,20 @@
+dependencies {
+  // common & server
+  implementation logback
+  implementation "org.eclipse.jetty:jetty-server"
+  implementation "org.eclipse.jetty:jetty-servlet"
+  implementation "org.glassfish.jersey.containers:jersey-container-jdk-http"
+  implementation "org.glassfish.jersey.media:jersey-media-json-jackson"
+  implementation "org.glassfish.jersey.ext:jersey-spring5"
+  implementation "javax.servlet:javax.servlet-api"
+  // saml dependencies
+  implementation "com.onelogin:java-saml:2.6.0"
+  // openid dependencies
+  implementation "com.nimbusds:oauth2-oidc-sdk:9.3"
+  // tests
+  testImplementation testing
+}
+
+test {
+  useJUnitPlatform()
+}

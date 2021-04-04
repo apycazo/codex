@@ -15,4 +15,5 @@ include 'codex-testing'
 include 'codex-golem'
 include 'codex-jetty'
 include 'codex-rest'
+include 'codex-auth'
 
