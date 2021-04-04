@@ -1,5 +1,6 @@
 package apycazo.codex.rest.features.api;
 
+import apycazo.codex.rest.common.status.StatusEndpoint;
 import apycazo.codex.rest.features.cached.CachedEndpoint;
 import apycazo.codex.rest.features.crud.CrudEndpoint;
 import apycazo.codex.rest.features.info.InfoEndpoint;
@@ -43,6 +44,11 @@ public class EndpointRouter {
   @Path("info")
   public InfoEndpoint subresource() {
     return context.getResource(InfoEndpoint.class);
+  }
+
+  @Path("status")
+  public StatusEndpoint status() {
+    return context.getResource(StatusEndpoint.class);
   }
 
   @Path("crud")
