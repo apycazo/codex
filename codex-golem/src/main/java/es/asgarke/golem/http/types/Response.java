@@ -17,9 +17,22 @@ public class Response {
   public Object content;
   public String mediaType;
 
+  public static Response status(int status) {
+    return Response.builder()
+      .status(status)
+      .build();
+  }
+
   public static Response ok() {
     return Response.builder()
       .status(200)
+      .build();
+  }
+
+  public static Response ok(Object entity) {
+    return Response.builder()
+      .status(200)
+      .content(entity)
       .build();
   }
 
@@ -60,5 +73,21 @@ public class Response {
       .content(msg)
       .mediaType(MediaType.TEXT_PLAIN)
       .build();
+  }
+
+  public Response withContent(String content) {
+    this.content = content;
+    return this;
+  }
+
+  public Response withMediaType(String mediaType) {
+    this.mediaType = mediaType;
+    return this;
+  }
+
+  public Response json(Object content) {
+    this.content = content;
+    this.mediaType = MediaType.APPLICATION_JSON;
+    return this;
   }
 }

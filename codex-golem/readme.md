@@ -192,8 +192,20 @@ status stating a request error has happened (HTTP status 400).
 
 Exception managers must be singletons implementing the interface `ExceptionMapper`.
 
-# TODO:
+# Design notes
 
-- static content provider
-- pre-generated actuator endpoints
-- Property placeholders & resolvers
+TODO
+
+# Backlog:
+
+- property reading: first try file, then classpath.
+- static content provider.
+- pre-generated actuator endpoints.
+- ssl connections (HttpsServer instead of HttpServer). 
+- remote configuration and refreshable properties.
+- add Javalin as an optional http server for better functionality.
+- test fat-jar builds.
+
+# Bugs
+
+- [ ] Response without content type not picking the method default media.

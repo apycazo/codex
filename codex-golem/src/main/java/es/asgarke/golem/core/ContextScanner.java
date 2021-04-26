@@ -117,6 +117,10 @@ public class ContextScanner {
         .of(annotation.scanPackages())
         .map(Class::getPackageName)
         .collect(Collectors.toCollection(() -> packagesToScan));
+      // if no packages were specified use the config class package
+      if (packagesToScan.isEmpty()) {
+        packagesToScan.add(configClass.getPackageName());
+      }
       // manage any imports
       Class<?>[] importedClasses = annotation.importDefinitions();
       for (Class<?> importedClass : importedClasses) {

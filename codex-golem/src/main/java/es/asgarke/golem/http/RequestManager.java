@@ -7,6 +7,7 @@ import es.asgarke.golem.core.constructors.BeanDefinition;
 import es.asgarke.golem.http.annotations.Endpoint;
 import es.asgarke.golem.http.annotations.RestResource;
 import es.asgarke.golem.http.definitions.HeaderKeys;
+import es.asgarke.golem.http.definitions.HttpMethod;
 import es.asgarke.golem.http.definitions.MediaType;
 import es.asgarke.golem.http.types.ExceptionMapper;
 import es.asgarke.golem.http.types.MediaTypeMapper;
@@ -32,6 +33,7 @@ public class RequestManager implements HttpHandler {
 
   private final MappingNode root;
   private final List<MediaTypeMapper> mediaTypeMappers;
+  @SuppressWarnings("rawtypes")
   private final List<ExceptionMapper> exceptionMappers;
 
   public RequestManager(
@@ -80,17 +82,18 @@ public class RequestManager implements HttpHandler {
           } else {
             MediaTypeMapper mapper = resolveMapperForMediaType(consumedMedia);
             RequestProcessor processor = new RequestProcessor(consumedMedia, producedMedia, method, instance, mapper);
-            terminal.setProcessor(processor);
-            log.info("Added endpoint for path {}", endpointPath);
+            terminal.setProcessor(endpoint.method(), processor);
+            log.info("Added endpoint {} {} to {}::{}", endpoint.method(), endpointPath, clazz, method.getName());
           }
         }
       }
     }
   }
 
+  @SuppressWarnings("unchecked")
   private Response resolveRequest(HttpExchange exchange) {
     String path = exchange.getRequestURI().getPath();
-    log.info("Resolving request for path {}", path);
+    log.info("Resolving {} request for path {}", exchange.getRequestMethod(), path);
     String[] requestPathSegments = path.substring(1).split("/");
     MappingNode node = root;
     Map<String, String> pathVariables = new HashMap<>();
@@ -98,26 +101,32 @@ public class RequestManager implements HttpHandler {
     while (node != null && index < requestPathSegments.length) {
       String currentSegment = requestPathSegments[index++];
       node = node.resolveNext(currentSegment);
-      if (node.isVariablePath()) {
-        pathVariables.put(node.variableName, currentSegment);
-      }
+      node.placeholderNames.forEach(variable -> pathVariables.put(variable, currentSegment));
     }
     if (node == null) {
       log.info("Node for found: the path '{}' is not mapped", path);
       return Response.notFound();
     } else {
-      try {
-        return node.processor.process(exchange, pathVariables);
-      } catch (InvocationTargetException e) {
-        Throwable actualException = e.getCause();
-        if (actualException == null) {
-          return Response.internalServerError(e);
-        } else {
-          return exceptionMappers.stream()
-            .filter(mapper -> mapper.dealsWith(actualException))
-            .findFirst()
-            .map(mapper -> mapper.getResponse(actualException))
-            .orElse(Response.requestError(actualException));
+      HttpMethod requestMethod = HttpMethod // extract the request method to resolve the processor.
+        .parseFrom(exchange.getRequestMethod())
+        .orElseThrow(() -> new RuntimeException("Invalid request method: " + exchange.getRequestMethod()));
+      RequestProcessor requestProcessor = node.processors.get(requestMethod);
+      if (requestProcessor == null) {
+        return Response.notFound();
+      } else {
+        try {
+          return requestProcessor.process(exchange, pathVariables);
+        } catch (InvocationTargetException e) {
+          Throwable actualException = e.getCause();
+          if (actualException == null) {
+            return Response.internalServerError(e);
+          } else {
+            return exceptionMappers.stream()
+              .filter(mapper -> mapper.dealsWith(actualException))
+              .findFirst()
+              .map(mapper -> mapper.getResponse(actualException))
+              .orElse(Response.requestError(actualException));
+          }
         }
       }
     }
@@ -157,44 +166,38 @@ public class RequestManager implements HttpHandler {
 
   private static class MappingNode {
     private final Map<String, MappingNode> leaves;
-    private final String variableName;
-    private RequestProcessor processor;
+    private final Set<String> placeholderNames;
+    private final Map<HttpMethod, RequestProcessor> processors;
 
     public MappingNode() {
-      this("");
-    }
-
-    public MappingNode(String name) {
       this.leaves = new HashMap<>();
-      this.processor = null;
-      this.variableName = name.startsWith(":") ? name.substring(1) : "";
-    }
-
-    public boolean isVariablePath() {
-      return !variableName.isBlank();
+      this.placeholderNames = new HashSet<>();
+      this.processors = new HashMap<>();
     }
 
     public MappingNode traverseOrCreate(String name) {
-      if (leaves.containsKey(name)) {
-        return leaves.get(name);
-      } else {
-        MappingNode node = new MappingNode(name);
-        String nodeName = node.isVariablePath() ? "*" : name;
-        if ("*".equals(nodeName) && leaves.containsKey("*")) {
-          throw new RuntimeException("Each node can contain only one variable name");
-        } else {
-          leaves.put(nodeName, node);
-          return node;
-        }
+      boolean isPathVariable = name.startsWith(":");
+      String leafName = name.startsWith(":") ? "*" : name;
+      MappingNode node = leaves.containsKey(leafName)
+        ? leaves.get(leafName)
+        : new MappingNode();
+      if (isPathVariable) {
+        node.placeholderNames.add(name.substring(1));
       }
+      leaves.put(leafName, node);
+      return node;
     }
 
     public MappingNode resolveNext(String name) {
       return leaves.getOrDefault(name, leaves.get("*"));
     }
 
-    public void setProcessor(RequestProcessor processor) {
-      this.processor = processor;
+    public void setProcessor(HttpMethod method, RequestProcessor processor) {
+      if (processors.containsKey(method)) {
+        throw new RuntimeException(String.format("Method %s already mapped for the current path", method.name()));
+      } else {
+        processors.put(method, processor);
+      }
     }
   }
 }
