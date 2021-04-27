@@ -23,7 +23,12 @@ public class FileTool {
         filePath = filePath.substring(FILE_HDR.length());
         file = new File(filePath);
       } else {
-        file = new File(filePath);
+        Optional<File> fileOption = resolveFileFromStringPath(FILE_HDR + filePath);
+        if (fileOption.isPresent()) {
+          return fileOption;
+        } else {
+          return resolveFileFromStringPath(CLASSPATH_HDR + filePath);
+        }
       }
       if (file != null && file.exists()) {
         return Optional.of(file);

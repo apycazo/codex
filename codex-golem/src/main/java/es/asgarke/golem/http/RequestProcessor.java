@@ -9,6 +9,7 @@ import es.asgarke.golem.http.definitions.HeaderKeys;
 import es.asgarke.golem.http.types.MediaTypeMapper;
 import es.asgarke.golem.http.types.Response;
 import es.asgarke.golem.tools.ParserTool;
+import es.asgarke.golem.tools.StringTool;
 import es.asgarke.golem.types.MethodParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,11 @@ public class RequestProcessor {
       if (result == null) {
         return Response.builder().status(status).build();
       } else if (result instanceof Response) {
-        return (Response) result;
+        Response response = (Response) result;
+        if (StringTool.isEmpty(response.getMediaType()) && !StringTool.isEmpty(producedMedia)) {
+          response.setMediaType(producedMedia);
+        }
+        return response;
       } else {
         return Response.builder().status(status).content(result).mediaType(producedMedia).build();
       }

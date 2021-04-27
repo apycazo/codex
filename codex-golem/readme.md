@@ -32,12 +32,12 @@ prepended with `classpath:`, so the context knows where to look at.
 
 ### Singleton
 
-Any class annotated with `@Singleton` and scanned bu the context will have its definition registered, and will be 
+Any class annotated with `@Singleton` and scanned by the context will have its definition registered, and will be 
 available to be injected into any other component requiring it. 
 
 #### Lazy singletons
 
-Bu default, singletons will be eagerly initialized when the component scan phase has been completed. To avoid this, a
+By default, singletons will be eagerly initialized when the component scan phase has been completed. To avoid this, a
 singleton can also include the annotation `@Lazy`, which will delay the bean instancing until some other component 
 actually demands it.
 
@@ -77,7 +77,7 @@ instance and thus will create a new one each time an injection requires it.
 
 When we have two competing beans, and we need to prioritize one of them, we can use the annotation `@Primary` to 
 indicate which of them we want to inject. Having multiple `@Primary` annotated beans breaks the mechanism, which should
-be reserved to tests and very specific scenarios.
+be reserved to testing and very specific scenarios.
 
 ### Injection
 
@@ -157,8 +157,8 @@ class MyResource {
 
 To map a dynamic value into an endpoint path, use the notation `:<name>` as part of the path. For example, to fetch
 a value by its id might use a resource path like `/api/resource/:id`. This id can be injected later into the method
-processing the request. Note that given a path, only one dynamic value can be injected on each segment, so we cannot 
-have another endpoint mapped like `/api/resource/:test`.
+processing the request. Note that given a path, only one dynamic value can be injected per segment and http method, 
+so we cannot have another endpoint mapped like `/api/resource/:test` if both use 'GET' as method, for example.
 
 ### Injecting endpoint values
 
@@ -198,14 +198,9 @@ TODO
 
 # Backlog:
 
-- property reading: first try file, then classpath.
 - static content provider.
 - pre-generated actuator endpoints.
 - ssl connections (HttpsServer instead of HttpServer). 
 - remote configuration and refreshable properties.
 - add Javalin as an optional http server for better functionality.
 - test fat-jar builds.
-
-# Bugs
-
-- [ ] Response without content type not picking the method default media.

@@ -6,7 +6,7 @@ import es.asgarke.golem.http.GolemServer;
 /**
  * Starts a Golem web application, using this package as the base for the component scan
  */
-@Configuration(propertySources = "classpath:golem.properties")
+@Configuration(propertySources = "golem.properties")
 public class DemoGolemApp {
 
   public static void main(String[] args) {

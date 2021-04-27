@@ -16,7 +16,7 @@ import java.util.Properties;
 @Slf4j
 public class ParserTool {
 
-  public static Optional<Properties> readPropertiesFrom(File file) {
+  public static Optional<Properties> readPropertiesFromFile(File file) {
     Properties properties = new Properties();
     try (InputStream stream = new FileInputStream(file)) {
       properties.load(stream);
@@ -29,23 +29,31 @@ public class ParserTool {
   public static Optional<Properties> readFromStringPath(String path) {
     String classpathHeader = "classpath:";
     String fileHeader = "file:";
-    Properties properties = new Properties();
-    try {
-      if (path.startsWith(classpathHeader)) {
-        String actualPath = path.substring(classpathHeader.length());
-        URL resource = ParserTool.class.getClassLoader().getResource(actualPath);
-        if (resource != null) {
-          Path filePath = Paths.get(resource.toURI());
-          readPropertiesFrom(filePath.toFile()).ifPresent(properties::putAll);
+    if (path.startsWith(classpathHeader)) {
+      String actualPath = path.substring(classpathHeader.length());
+      URL resource = ParserTool.class.getClassLoader().getResource(actualPath);
+      if (resource != null) {
+        try {
+          File file = Paths.get(resource.toURI()).toFile();
+          return readPropertiesFromFile(file);
+        } catch (Exception e) {
+          log.error("Failed to read properties from '{}'", path);
+          return Optional.empty();
         }
       } else {
-        String actualPath = path.startsWith(fileHeader) ? path.substring(fileHeader.length()) : path;
-        File file = new File(actualPath);
-        return readPropertiesFrom(file);
+        return Optional.empty();
       }
-      return Optional.of(properties);
-    } catch (Exception e) {
-      return Optional.empty();
+    } else if (path.startsWith(fileHeader)) {
+      String actualPath = path.substring(fileHeader.length());
+      File file = new File(actualPath);
+      return file.exists() ? readPropertiesFromFile(file) : Optional.empty();
+    } else {
+      Optional<Properties> fileOption = readFromStringPath(fileHeader + path);
+      if (fileOption.isPresent()) {
+        return fileOption;
+      } else {
+        return readFromStringPath(classpathHeader + path);
+      }
     }
   }
 

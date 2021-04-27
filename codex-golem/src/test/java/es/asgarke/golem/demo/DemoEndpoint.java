@@ -40,7 +40,8 @@ public class DemoEndpoint {
   public Response get(@PathParam("id") String key) {
     Optional<Object> value = service.get(key);
     if (value.isPresent()) {
-      return Response.ok().json(value.get());
+//      return Response.ok().json(value.get());
+      return Response.ok(value.get());
     } else {
       return Response.notFound();
     }
