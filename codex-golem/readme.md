@@ -198,7 +198,7 @@ TODO
 
 # Backlog:
 
-- static content provider.
+- static content provider: add a binary content mapper
 - pre-generated actuator endpoints.
 - ssl connections (HttpsServer instead of HttpServer). 
 - remote configuration and refreshable properties.

@@ -10,6 +10,7 @@ import es.asgarke.golem.http.types.JsonMediaTypeMapper;
 import es.asgarke.golem.http.types.MediaTypeMapper;
 import es.asgarke.golem.http.types.PlainTextMediaTypeMapper;
 import es.asgarke.golem.tools.ParserTool;
+import es.asgarke.golem.tools.StringTool;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,7 +74,8 @@ public class GolemServer {
     server.setExecutor(poolSize > 0 ? Executors.newFixedThreadPool(poolSize) : null);
     // register endpoint handler
     List<BeanDefinition<?>> restResources = factory.registerRestResources();
-    RequestManager manager = new RequestManager(factory, basePath, restResources);
+    StaticResolver staticResolver = initializeStaticResolver(properties);
+    RequestManager manager = new RequestManager(factory, basePath, restResources, staticResolver);
     server.createContext(basePath, manager);
     // create a shutdown hook
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -122,5 +124,20 @@ public class GolemServer {
     if (mappers.stream().noneMatch(v -> v.canMapMediaType(MediaType.TEXT_PLAIN))) {
       factory.registerSingleton(PlainTextMediaTypeMapper.class);
     }
+  }
+
+  private StaticResolver initializeStaticResolver(BeanProperties properties) {
+    StaticResolver resolver = new StaticResolver();
+    String classpathValues = properties.resolvePropertyTemplate(PROPERTY_STATIC_CP);
+    if (StringTool.isNotEmpty(classpathValues)) {
+      String[] paths = StringTool.splitCommaAndTrim(classpathValues);
+      resolver.addClassPathLocations(paths);
+    }
+    String fileSystemValues = properties.resolvePropertyTemplate(PROPERTY_STATIC_FS);
+    if (StringTool.isNotEmpty(fileSystemValues)) {
+      String[] paths = StringTool.splitCommaAndTrim(fileSystemValues);
+      resolver.addFilePathLocations(paths);
+    }
+    return resolver;
   }
 }

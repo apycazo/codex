@@ -35,9 +35,18 @@ public class RequestManager implements HttpHandler {
   private final List<MediaTypeMapper> mediaTypeMappers;
   @SuppressWarnings("rawtypes")
   private final List<ExceptionMapper> exceptionMappers;
+  private final StaticResolver staticResolver;
 
+  /**
+   * Creates a request manager, which will map all rest resources and prepare the mapping nodes to resolve requests.
+   * @param factory the factory to fetch beans.
+   * @param rootPath the base path to apply to all endpoints.
+   * @param endpointBeans the list of beans defining endpoints.
+   * @param staticResolver when static content paths are present, the resolver to use.
+   */
   public RequestManager(
-    BeanFactory factory, String rootPath, List<BeanDefinition<?>> endpointBeans) {
+    BeanFactory factory, String rootPath, List<BeanDefinition<?>> endpointBeans, StaticResolver staticResolver) {
+    this.staticResolver = staticResolver;
     this.root = new MappingNode();
     // register media mappers found
     this.mediaTypeMappers = factory.findBeansMatching(MediaTypeMapper.class)
@@ -90,6 +99,40 @@ public class RequestManager implements HttpHandler {
     }
   }
 
+  /**
+   * Handles the provided exchange. This method will resolve a response for the exchange, and write the response.
+   * @param exchange the exchange to process.
+   * @throws IOException on exchange writting errors.
+   */
+  @Override
+  public void handle(HttpExchange exchange) throws IOException {
+    // create a request context from the exchange?
+    Response response = resolveRequest(exchange);
+    // resolve the media type
+    String mediaType = response.getMediaType();
+    if (mediaType != null && !mediaType.isBlank()) {
+      exchange.getResponseHeaders().add(HeaderKeys.CONTENT_TYPE, mediaType);
+    }
+    // resolve a media mapper (defaults to text/plain)
+    MediaTypeMapper mediaTypeMapper = resolveMapperForMediaType(mediaType);
+    if (mediaTypeMapper == null) {
+      log.warn("No media mapper resolved for {}", mediaType);
+      throw new RuntimeException("Failed to find a valid media type mapper for " + mediaType);
+    }
+    byte[] bodyBytes = mediaTypeMapper.toByteArray(response.getContent());
+    // actually send the response
+    exchange.sendResponseHeaders(response.getStatus(), bodyBytes.length);
+    OutputStream outputStream = exchange.getResponseBody();
+    outputStream.write(bodyBytes);
+    outputStream.flush();
+    exchange.close();
+  }
+
+  /**
+   * Resolves a request exchange into a response value for the server to return.
+   * @param exchange the current http exchange to process.
+   * @return the generated response from the node, if any.
+   */
   @SuppressWarnings("unchecked")
   private Response resolveRequest(HttpExchange exchange) {
     String path = exchange.getRequestURI().getPath();
@@ -101,11 +144,18 @@ public class RequestManager implements HttpHandler {
     while (node != null && index < requestPathSegments.length) {
       String currentSegment = requestPathSegments[index++];
       node = node.resolveNext(currentSegment);
-      node.placeholderNames.forEach(variable -> pathVariables.put(variable, currentSegment));
+      if (node != null) {
+        node.placeholderNames.forEach(variable -> pathVariables.put(variable, currentSegment));
+      } else {
+        break;
+      }
     }
     if (node == null) {
-      log.info("Node for found: the path '{}' is not mapped", path);
-      return Response.notFound();
+      Response response = staticResolver.resolveResource(path);
+      if (response.getStatus() == 404) {
+        log.info("Node for found: the path '{}' is not mapped", path);
+      }
+      return response;
     } else {
       HttpMethod requestMethod = HttpMethod // extract the request method to resolve the processor.
         .parseFrom(exchange.getRequestMethod())
@@ -130,30 +180,6 @@ public class RequestManager implements HttpHandler {
         }
       }
     }
-  }
-
-  @Override
-  public void handle(HttpExchange exchange) throws IOException {
-    // create a request context from the exchange?
-    Response response = resolveRequest(exchange);
-    // resolve the media type
-    String mediaType = response.getMediaType();
-    if (mediaType != null && !mediaType.isBlank()) {
-      exchange.getResponseHeaders().add(HeaderKeys.CONTENT_TYPE, mediaType);
-    }
-    // resolve a media mapper (defaults to text/plain)
-    MediaTypeMapper mediaTypeMapper = resolveMapperForMediaType(mediaType);
-    if (mediaTypeMapper == null) {
-      log.warn("No media mapper resolved for {}", mediaType);
-      throw new RuntimeException("Failed to find a valid media type mapper for " + mediaType);
-    }
-    byte[] bodyBytes = mediaTypeMapper.toByteArray(response.getContent());
-    // actually send the response
-    exchange.sendResponseHeaders(response.getStatus(), bodyBytes.length);
-    OutputStream outputStream = exchange.getResponseBody();
-    outputStream.write(bodyBytes);
-    outputStream.flush();
-    exchange.close();
   }
 
   private MediaTypeMapper resolveMapperForMediaType(String mediaType) {

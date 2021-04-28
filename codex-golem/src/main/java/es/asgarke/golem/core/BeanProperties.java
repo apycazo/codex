@@ -48,12 +48,14 @@ public class BeanProperties {
     if (template == null || template.isBlank()) {
       throw new RuntimeException("Property template is empty");
     } else {
-      String [] elements = template.strip().split(":");
+      String[] elements = template.strip().split(":");
       String key = elements[0];
       if (properties.containsKey(key)) {
         return properties.getProperty(key);
       } else if (elements.length > 1) {
         return elements[1];
+      } else if (template.endsWith(":")) {
+        return "";
       } else {
         throw new RuntimeException("Property " + key + " not found");
       }

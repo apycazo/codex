@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.net.URL;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 public class FileTool {
 
-  private static final String FILE_HDR = "file:";
-  private static final String CLASSPATH_HDR = "classpath:";
+  public static final String FILE_HDR = "file:";
+  public static final String CLASSPATH_HDR = "classpath:";
 
   public static Optional<File> resolveFileFromStringPath(String filePath) {
     try {
