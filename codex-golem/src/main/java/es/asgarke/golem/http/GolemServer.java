@@ -6,6 +6,7 @@ import es.asgarke.golem.core.BeanProperties;
 import es.asgarke.golem.core.GolemContext;
 import es.asgarke.golem.core.constructors.BeanDefinition;
 import es.asgarke.golem.http.definitions.MediaType;
+import es.asgarke.golem.http.types.BinaryMediaTypeMapper;
 import es.asgarke.golem.http.types.JsonMediaTypeMapper;
 import es.asgarke.golem.http.types.MediaTypeMapper;
 import es.asgarke.golem.http.types.PlainTextMediaTypeMapper;
@@ -16,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -36,8 +39,12 @@ public class GolemServer {
   }
 
   public static GolemServer startServer(int httpPort, Class<?>... classes) {
+    Instant start = Instant.now();
     GolemContext golemContext = GolemContext.startContext(classes);
-    return new GolemServer(golemContext, httpPort).start();
+    GolemServer golemServer = new GolemServer(golemContext, httpPort).start();
+    Instant finish = Instant.now();
+    log.info("Start time was {} ms", Duration.between(start, finish).toMillis());
+    return golemServer;
   }
 
   public GolemServer (GolemContext context) {
@@ -123,6 +130,9 @@ public class GolemServer {
     }
     if (mappers.stream().noneMatch(v -> v.canMapMediaType(MediaType.TEXT_PLAIN))) {
       factory.registerSingleton(PlainTextMediaTypeMapper.class);
+    }
+    if (mappers.stream().noneMatch(v -> v.canMapMediaType(MediaType.IMAGE_ANY))) {
+      factory.registerSingleton(BinaryMediaTypeMapper.class);
     }
   }
 

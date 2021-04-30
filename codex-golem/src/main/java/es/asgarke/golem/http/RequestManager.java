@@ -102,7 +102,7 @@ public class RequestManager implements HttpHandler {
   /**
    * Handles the provided exchange. This method will resolve a response for the exchange, and write the response.
    * @param exchange the exchange to process.
-   * @throws IOException on exchange writting errors.
+   * @throws IOException on exchange writing errors.
    */
   @Override
   public void handle(HttpExchange exchange) throws IOException {

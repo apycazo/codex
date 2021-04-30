@@ -176,13 +176,13 @@ We can inject three different value types into a method processing a request:
 ### Serializing media types
 
 To (de)serialize request bodies and responses, specific beans, implementing the interface `MediaTypeMapper` are used.
-By default, mappers for `text/plain` and `application/json` media types will be registered by default when no others
-can be found.
+By default, mappers for `text/plain`, `application/json` and `image/*` media types will be registered by default when no 
+others can be found.
 
 A custom implementation can be provided, which will be used instead of these, as long as they map the same media type, 
 and they are declared as beans (they should NOT be prototypes, though). Mapper beans will be initialized lazily.
 
-The default implementations available are `JsonMediaTypeMapper` and `PlainTextMediaTypeMapper`.  
+The default implementations available are `JsonMediaTypeMapper`, `PlainTextMediaTypeMapper` and `BinaryMediaTypeMapper`.  
 
 ### Handling errors
 
@@ -198,9 +198,8 @@ TODO
 
 # Backlog:
 
-- static content provider: add a binary content mapper
+- thread-local request info data injection.
 - pre-generated actuator endpoints.
 - ssl connections (HttpsServer instead of HttpServer). 
 - remote configuration and refreshable properties.
-- add Javalin as an optional http server for better functionality.
 - test fat-jar builds.

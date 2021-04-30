@@ -12,5 +12,6 @@ public class MediaType {
   public static final String TEXT_CSS = "text/css";
   public static final String TEXT_CSV = "text/csv";
   public static final String TEXT_PHP = "text/php";
-
+  public static final String IMAGE_JPEG = "image/jpeg";
+  public static final String IMAGE_ANY = "image/*";
 }

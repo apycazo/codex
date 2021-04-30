@@ -62,7 +62,7 @@ public class StaticResolver {
       try {
         Path path = file.get().toPath();
         String mediaType = Files.probeContentType(path);
-        String content = new String(Files.readAllBytes(path));
+        byte[] content = Files.readAllBytes(path);
         return Response.ok(content).withMediaType(mediaType);
       } catch (IOException e) {
         log.error("Unable to resolve file type for '{}'", file.get().getAbsolutePath());
