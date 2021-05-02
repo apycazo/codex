@@ -1,5 +1,6 @@
 package es.asgarke.golem.demo;
 
+import es.asgarke.golem.http.CurrentRequest;
 import es.asgarke.golem.http.annotations.Body;
 import es.asgarke.golem.http.annotations.Endpoint;
 import es.asgarke.golem.http.annotations.PathParam;
@@ -7,11 +8,14 @@ import es.asgarke.golem.http.annotations.RestResource;
 import es.asgarke.golem.http.definitions.HttpMethod;
 import es.asgarke.golem.http.definitions.MediaType;
 import es.asgarke.golem.http.types.Response;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
+@SuppressWarnings("unused")
 @RestResource(path = "/api")
 public class DemoEndpoint {
 
@@ -22,6 +26,11 @@ public class DemoEndpoint {
   public DemoEndpoint(DataService service, ConfigHolder config) {
     this.service = service;
     this.config = config;
+  }
+
+  @Endpoint(method = HttpMethod.GET, path = "/id", produces = MediaType.APPLICATION_JSON)
+  public Map<String, String> getAttribute() {
+    return Map.of("id", CurrentRequest.getId());
   }
 
   @Endpoint(method = HttpMethod.GET, path = "/config", produces = MediaType.APPLICATION_JSON)
@@ -40,7 +49,6 @@ public class DemoEndpoint {
   public Response get(@PathParam("id") String key) {
     Optional<Object> value = service.get(key);
     if (value.isPresent()) {
-//      return Response.ok().json(value.get());
       return Response.ok(value.get());
     } else {
       return Response.notFound();
@@ -72,5 +80,12 @@ public class DemoEndpoint {
   public Response clear() {
     service.clear();
     return Response.ok();
+  }
+
+  @Endpoint(method = HttpMethod.GET, path = "wait/:time")
+  public Response hold(@PathParam("time") Integer time) throws InterruptedException {
+    log.info("Waiting {} ms", time);
+    Thread.sleep(time);
+    return Response.ok("Done");
   }
 }

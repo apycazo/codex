@@ -1,6 +1,5 @@
 package es.asgarke.golem.http.types;
 
-import es.asgarke.golem.http.definitions.MediaType;
 import es.asgarke.golem.tools.StringTool;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,8 +19,7 @@ public class PlainTextMediaTypeMapper implements MediaTypeMapper {
     if (StringTool.isEmpty(mediaType)) {
       return false;
     } else {
-      return mediaType.toLowerCase().startsWith("text/") ||
-      mediaType.equalsIgnoreCase(MediaType.TEXT_PLAIN);
+      return mediaType.toLowerCase().startsWith("text/");
     }
   }
 

@@ -115,7 +115,7 @@ much like the rest. The available properties to use are:
 
 * **golem.server.http.port** [default: 8080]: Defines the port to listen to. Using the value '0' will be interpreted as
   a random port requirement.
-* **golem.server.pool.size** [default: 4]: The number of threads to initialize the server thread pool.
+* **golem.server.pool.size** [default: 8]: The number of threads to initialize the server thread pool.
 * **golem.server.mapping.base** [default: /]: Base mapping path, will be applied to all endpoints.   
 
 ### Creating endpoints
@@ -192,13 +192,27 @@ status stating a request error has happened (HTTP status 400).
 
 Exception managers must be singletons implementing the interface `ExceptionMapper`.
 
-# Design notes
+### Current request data
 
-TODO
+A thread local is used to keep data related to the current request (by default, includes the request ID and the 
+HttpExchange being resolved).
+
+To use, just call the appropriate static method of the class `CurrentRequest`. For example: 
+```java
+@Endpoint(method = HttpMethod.GET, path = "/id", produces = MediaType.APPLICATION_JSON)
+public Map<String, String> getAttribute() {
+  return Map.of("id", CurrentRequest.getId());
+}
+```
+
+### Limitations and things to notice
+
+- Rest endpoints can not map simple types, only objects (this is, need to use Integer instead of int, for example).
+- The default pool size if fairly small (8), since this is meant to be used for small applications.
 
 # Backlog:
 
-- thread-local request info data injection.
+- service request filter
 - pre-generated actuator endpoints.
 - ssl connections (HttpsServer instead of HttpServer). 
 - remote configuration and refreshable properties.

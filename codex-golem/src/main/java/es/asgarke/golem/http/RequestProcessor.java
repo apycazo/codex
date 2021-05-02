@@ -30,6 +30,8 @@ public class RequestProcessor {
   private final MediaTypeMapper mapper;
 
   public Response process(HttpExchange exchange, Map<String, String> pathVariables) throws InvocationTargetException {
+    // initialize the current request info
+    CurrentRequest.open(exchange);
     // check media type
     if (!consumedMedia.isBlank()) {
       boolean matchingHeader = exchange.getRequestHeaders().get(HeaderKeys.CONTENT_TYPE)
@@ -67,6 +69,8 @@ public class RequestProcessor {
       return Response.internalServerError(e);
     } catch (IOException e) {
       return Response.requestError(e);
+    } finally {
+      CurrentRequest.close(); // close the request in any case
     }
   }
 
@@ -74,12 +78,13 @@ public class RequestProcessor {
    * Checks whether the header value matches the expectation. An example of this would be:
    * <li>value = application/json; charset=UTF-8</li>
    * <li>expected = application/json</li>
-   * @param value the request header value to match.
+   *
+   * @param value    the request header value to match.
    * @param expected the value we need to match to.
    * @return true when the value matches the expectation (this is case insensitive).
    */
   private boolean isMatchingHeader(String value, String expected) {
-    if (value == null || value.isBlank() || expected == null ||expected.isBlank()) {
+    if (value == null || value.isBlank() || expected == null || expected.isBlank()) {
       return false;
     } else {
       return Arrays.stream(value.split("\\s*;\\s*"))
@@ -89,6 +94,7 @@ public class RequestProcessor {
 
   /**
    * Transforms a query string into a key-value map, to make it easier to recover values.
+   *
    * @param query the original string query.
    * @return the generated map (can be empty if the query is blank).
    */
@@ -111,7 +117,7 @@ public class RequestProcessor {
   }
 
   private Object resolveValue(MethodParam param, Map<String, String> pathVariables, Map<String, String> queryMap,
-                             HttpExchange exchange) throws IOException {
+    HttpExchange exchange) throws IOException {
     Optional<PathParam> pathParam = param.getAnnotation(PathParam.class);
     if (pathParam.isPresent()) {
       String varName = pathParam.get().value();
@@ -145,6 +151,7 @@ public class RequestProcessor {
         return strings;
       }
     }
+    // inject the current exchange if the method requires it.
     if (param.getType() == HttpExchange.class) {
       return exchange;
     }
