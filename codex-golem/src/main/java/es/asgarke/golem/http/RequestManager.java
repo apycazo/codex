@@ -2,17 +2,16 @@ package es.asgarke.golem.http;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import es.asgarke.golem.common.OrderedComparator;
 import es.asgarke.golem.core.BeanFactory;
 import es.asgarke.golem.core.constructors.BeanDefinition;
 import es.asgarke.golem.http.annotations.Endpoint;
 import es.asgarke.golem.http.annotations.RestResource;
-import es.asgarke.golem.http.definitions.HeaderKeys;
-import es.asgarke.golem.http.definitions.HttpMethod;
-import es.asgarke.golem.http.definitions.MediaType;
+import es.asgarke.golem.http.definitions.*;
 import es.asgarke.golem.http.types.ExceptionMapper;
 import es.asgarke.golem.http.types.MediaTypeMapper;
 import es.asgarke.golem.http.types.Response;
-import es.asgarke.golem.tools.StringTool;
+import es.asgarke.golem.tools.StringOps;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -36,6 +35,8 @@ public class RequestManager implements HttpHandler {
   @SuppressWarnings("rawtypes")
   private final List<ExceptionMapper> exceptionMappers;
   private final StaticResolver staticResolver;
+  private final List<RequestFilter> requestFilters;
+  private final List<ResponseFilter> responseFilters;
 
   /**
    * Creates a request manager, which will map all rest resources and prepare the mapping nodes to resolve requests.
@@ -48,6 +49,8 @@ public class RequestManager implements HttpHandler {
     BeanFactory factory, String rootPath, List<BeanDefinition<?>> endpointBeans, StaticResolver staticResolver) {
     this.staticResolver = staticResolver;
     this.root = new MappingNode();
+    this.requestFilters = new ArrayList<>();
+    this.responseFilters = new ArrayList<>();
     // register media mappers found
     this.mediaTypeMappers = factory.findBeansMatching(MediaTypeMapper.class)
       .map(definition -> definition.instance(factory))
@@ -60,18 +63,32 @@ public class RequestManager implements HttpHandler {
       .map(ExceptionMapper.class::cast)
       .collect(Collectors.toList());
     this.mediaTypeMappers.forEach(value -> log.info("Registered media mapper class {}", value.getClass()));
+    // locate request/response filters
+    OrderedComparator comparator = new OrderedComparator();
+    factory.findBeansMatching(RequestFilter.class)
+      .map(definition -> definition.instance(factory))
+      .map(RequestFilter.class::cast)
+      .collect(Collectors.toCollection(() -> requestFilters))
+      .sort(comparator);
+    requestFilters.forEach(filter -> log.info("Registered request filter '{}'", filter.getClass().getName()));
+    factory.findBeansMatching(ResponseFilter.class)
+      .map(definition -> definition.instance(factory))
+      .map(ResponseFilter.class::cast)
+      .collect(Collectors.toCollection(() -> responseFilters))
+      .sort(comparator);
+    responseFilters.forEach(filter -> log.info("Registered response filter '{}'", filter.getClass().getName()));
     // register definitions
     log.info("Found {} beans registering endpoints", endpointBeans.size());
     for (BeanDefinition<?> definition : endpointBeans) {
       Class<?> clazz = definition.getClazz();
       RestResource config = clazz.getAnnotation(RestResource.class);
-      String basePath = StringTool.joinPaths(rootPath, config.path());
+      String basePath = StringOps.joinPaths(rootPath, config.path());
       List<Method> methods = Arrays.stream(clazz.getMethods())
         .filter(m -> m.isAnnotationPresent(Endpoint.class))
         .collect(Collectors.toList());
       for (Method method : methods) {
         Endpoint endpoint = method.getAnnotation(Endpoint.class);
-        String endpointPath = StringTool.joinPaths(basePath, endpoint.path());
+        String endpointPath = StringOps.joinPaths(basePath, endpoint.path());
         String [] segments = endpointPath.substring(1).split("/");
         MappingNode terminal = root;
         for (String segment : segments) {
@@ -165,25 +182,71 @@ public class RequestManager implements HttpHandler {
         return Response.notFound();
       } else {
         try {
-          return requestProcessor.process(exchange, pathVariables);
-        } catch (InvocationTargetException e) {
-          Throwable actualException = e.getCause();
-          if (actualException == null) {
-            return Response.internalServerError(e);
-          } else {
-            return exceptionMappers.stream()
-              .filter(mapper -> mapper.dealsWith(actualException))
-              .findFirst()
-              .map(mapper -> mapper.getResponse(actualException))
-              .orElse(Response.requestError(actualException));
+          // initialize the current request info
+          CurrentRequest.open(exchange);
+          Response requestResponse = filterRequest(exchange);
+          if (requestResponse == null) { // no request filter has overridden the response
+            try {
+              requestResponse = requestProcessor.process(exchange, pathVariables);
+            } catch (InvocationTargetException e) {
+              Throwable actualException = e.getCause();
+              if (actualException == null) {
+                requestResponse = Response.internalServerError(e);
+              } else {
+                requestResponse = exceptionMappers.stream()
+                  .filter(mapper -> mapper.dealsWith(actualException))
+                  .findFirst()
+                  .map(mapper -> mapper.getResponse(actualException))
+                  .orElse(Response.requestError(actualException));
+              }
+            }
           }
+          // apply available response filters to the rest resource response (or the error value)
+          return filterResponse(requestResponse, exchange);
+        } finally {
+          CurrentRequest.close(); // close the request in any case
         }
       }
     }
   }
 
+  /**
+   * Applies all request filters the the current exchange.
+   * @param currentExchange the exchange being processed.
+   * @return the filtered response, if any filter has provided a response override.
+   */
+  private Response filterRequest(HttpExchange currentExchange) {
+    Response response = null;
+    Iterator<RequestFilter> filters = requestFilters.iterator();
+    while (response == null && filters.hasNext()) {
+      response = filters.next().filterRequest(currentExchange);
+    }
+    return response;
+  }
+
+  /**
+   * Filters the response using all registered response filters, and returning the final result.
+   * @param currentResponse the initial response, as provided by the rest resource.
+   * @param currentExchange the current exchange being processed.
+   * @return the final response generated after applying all filters.
+   */
+  private Response filterResponse(Response currentResponse, HttpExchange currentExchange) {
+    for (ResponseFilter filter : responseFilters) {
+      Response filteredResponse = filter.filterResponse(currentResponse, currentExchange);
+      if (filteredResponse != null) { // response should not be null, keep the last one if a filter returns null.
+        currentResponse = filteredResponse;
+      }
+    }
+    return currentResponse;
+  }
+
+  /**
+   * Transforms a string defining a media type into an actual type class.
+   * @param mediaType the media type to parse.
+   * @return the generated value (which might be null).
+   */
   private MediaTypeMapper resolveMapperForMediaType(String mediaType) {
-    String effectiveMediaType = StringTool.isEmpty(mediaType) ? MediaType.TEXT_PLAIN : mediaType;
+    String effectiveMediaType = StringOps.isEmpty(mediaType) ? MediaType.TEXT_PLAIN : mediaType;
     return mediaTypeMappers.stream()
       .filter(mapper -> mapper.canMapMediaType(effectiveMediaType))
       .findFirst()

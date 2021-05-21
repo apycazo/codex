@@ -2,7 +2,7 @@ package es.asgarke.golem.http;
 
 import es.asgarke.golem.http.types.Response;
 import es.asgarke.golem.tools.FileTool;
-import es.asgarke.golem.tools.StringTool;
+import es.asgarke.golem.tools.StringOps;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -75,7 +75,7 @@ public class StaticResolver {
 
   private void register(String header, String path) {
     String normalizedPath = normalizePath(path);
-    if (!StringTool.isEmpty(normalizedPath)) {
+    if (!StringOps.isEmpty(normalizedPath)) {
       String location = header + normalizedPath;
       basePaths.add(location);
       log.info("Added static content base location '{}'", location);
@@ -83,7 +83,7 @@ public class StaticResolver {
   }
 
   private String normalizePath(String path) {
-    if (StringTool.isEmpty(path)) {
+    if (StringOps.isEmpty(path)) {
       return null;
     }
     String fileSeparator = System.getProperty("file.separator");

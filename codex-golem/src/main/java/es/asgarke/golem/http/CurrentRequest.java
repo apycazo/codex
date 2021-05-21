@@ -1,7 +1,7 @@
 package es.asgarke.golem.http;
 
 import com.sun.net.httpserver.HttpExchange;
-import es.asgarke.golem.tools.StringTool;
+import es.asgarke.golem.tools.StringOps;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class CurrentRequest {
   }
 
   public static void setAttribute(String key, Object value) {
-    if (StringTool.isEmpty(key) || value == null) {
+    if (!StringOps.isEmpty(key) && value != null) {
       Map<String, Object> attributes = threadLocal.get();
       attributes.put(key, value);
     }

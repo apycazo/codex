@@ -205,6 +205,20 @@ public Map<String, String> getAttribute() {
 }
 ```
 
+### Request and response filters
+
+A request/response filter can be added just by adding a bean implementing whatever interface is required: 
+`RequestFilter` for requests, and `ResponseFilter` for responses. The filters can override the 'getOrder' method
+to ensure one filter is applied before another.
+
+Lower values will get higher priority. Default value is 5000. The recommended level groups are:
+
+- 1xxx: Gateway/Reception.
+- 2xxx: Authentication.
+- 3xxx: Authorization.
+- 4xxx: Server core.
+- 5xxx: User level.
+
 ### Limitations and things to notice
 
 - Rest endpoints can not map simple types, only objects (this is, need to use Integer instead of int, for example).
@@ -212,7 +226,6 @@ public Map<String, String> getAttribute() {
 
 # Backlog:
 
-- service request filter
 - pre-generated actuator endpoints.
 - ssl connections (HttpsServer instead of HttpServer). 
 - remote configuration and refreshable properties.

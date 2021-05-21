@@ -9,7 +9,7 @@ import es.asgarke.golem.http.definitions.HeaderKeys;
 import es.asgarke.golem.http.types.MediaTypeMapper;
 import es.asgarke.golem.http.types.Response;
 import es.asgarke.golem.tools.ParserTool;
-import es.asgarke.golem.tools.StringTool;
+import es.asgarke.golem.tools.StringOps;
 import es.asgarke.golem.types.MethodParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +30,6 @@ public class RequestProcessor {
   private final MediaTypeMapper mapper;
 
   public Response process(HttpExchange exchange, Map<String, String> pathVariables) throws InvocationTargetException {
-    // initialize the current request info
-    CurrentRequest.open(exchange);
     // check media type
     if (!consumedMedia.isBlank()) {
       boolean matchingHeader = exchange.getRequestHeaders().get(HeaderKeys.CONTENT_TYPE)
@@ -58,7 +56,7 @@ public class RequestProcessor {
         return Response.builder().status(status).build();
       } else if (result instanceof Response) {
         Response response = (Response) result;
-        if (StringTool.isEmpty(response.getMediaType()) && !StringTool.isEmpty(producedMedia)) {
+        if (StringOps.isEmpty(response.getMediaType()) && !StringOps.isEmpty(producedMedia)) {
           response.setMediaType(producedMedia);
         }
         return response;
@@ -69,8 +67,6 @@ public class RequestProcessor {
       return Response.internalServerError(e);
     } catch (IOException e) {
       return Response.requestError(e);
-    } finally {
-      CurrentRequest.close(); // close the request in any case
     }
   }
 

@@ -1,16 +1,19 @@
 package es.asgarke.golem.demo;
 
+import es.asgarke.golem.common.OrderedComparator;
 import es.asgarke.golem.http.GolemServer;
 import es.asgarke.golem.http.definitions.MediaType;
 import org.junit.jupiter.api.*;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Automatic tests for the DemoAPP, to facilitate the app evolution.
@@ -130,5 +133,33 @@ public class DemoTest {
       .then()
       .statusCode(200);
     assertThat(service.size()).isEqualTo(0);
+  }
+
+  @Test
+  @DisplayName("responses without a request id header return with one using a random value")
+  void requestIdIsInResponse() {
+    given()
+      .port(server.getHttpPort())
+      .when()
+      .get("/api/config")
+      .then()
+      .log().all()
+      .statusCode(200)
+      .header(IdRequestFilter.ID_ATTRIBUTE_NAME, not(empty()));
+  }
+
+  @Test
+  @DisplayName("requests with a given id return with the same value")
+  void requestIsMaintainedInResponse() {
+    String expectedId = "fixed-id-1234";
+    given()
+      .port(server.getHttpPort())
+      .header(IdRequestFilter.ID_ATTRIBUTE_NAME, expectedId)
+      .when()
+      .get("/api/config")
+      .then()
+      .log().all()
+      .statusCode(200)
+      .header(IdRequestFilter.ID_ATTRIBUTE_NAME, equalTo(expectedId));
   }
 }
