@@ -1,14 +1,11 @@
 package es.asgarke.golem.demo;
 
-import es.asgarke.golem.common.OrderedComparator;
 import es.asgarke.golem.http.GolemServer;
 import es.asgarke.golem.http.definitions.MediaType;
 import org.junit.jupiter.api.*;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -161,5 +158,18 @@ public class DemoTest {
       .log().all()
       .statusCode(200)
       .header(IdRequestFilter.ID_ATTRIBUTE_NAME, equalTo(expectedId));
+  }
+
+  @Test
+  @DisplayName("responses can include custom headers")
+  void responseWithCustomHeader() {
+    given()
+      .port(server.getHttpPort())
+      .when()
+      .get("/api/ping")
+      .then()
+      .log().all()
+      .statusCode(200)
+      .header("x-custom-header", equalTo("ping"));
   }
 }

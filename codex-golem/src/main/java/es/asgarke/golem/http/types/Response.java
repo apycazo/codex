@@ -1,6 +1,8 @@
 package es.asgarke.golem.http.types;
 
+import com.sun.net.httpserver.Headers;
 import es.asgarke.golem.http.definitions.MediaType;
+import es.asgarke.golem.tools.StringValue;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,9 +15,11 @@ import lombok.NoArgsConstructor;
 public class Response {
 
   @Builder.Default
-  public int status = 200;
-  public Object content;
-  public String mediaType;
+  private int status = 200;
+  private Object content;
+  private String mediaType;
+  @Builder.Default
+  private Headers headers = new Headers();
 
   public static Response status(int status) {
     return Response.builder()
@@ -88,6 +92,13 @@ public class Response {
   public Response json(Object content) {
     this.content = content;
     this.mediaType = MediaType.APPLICATION_JSON;
+    return this;
+  }
+
+  public Response addHeader(String key, String value) {
+    if (StringValue.isNotEmpty(key)) {
+      headers.add(key, value);
+    }
     return this;
   }
 }

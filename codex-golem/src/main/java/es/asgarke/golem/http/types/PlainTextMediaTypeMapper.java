@@ -1,6 +1,6 @@
 package es.asgarke.golem.http.types;
 
-import es.asgarke.golem.tools.StringOps;
+import es.asgarke.golem.tools.StringValue;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
@@ -16,7 +16,7 @@ public class PlainTextMediaTypeMapper implements MediaTypeMapper {
 
   @Override
   public boolean canMapMediaType(String mediaType) {
-    if (StringOps.isEmpty(mediaType)) {
+    if (StringValue.isEmpty(mediaType)) {
       return false;
     } else {
       return mediaType.toLowerCase().startsWith("text/");

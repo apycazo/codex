@@ -11,7 +11,7 @@ import es.asgarke.golem.http.types.JsonMediaTypeMapper;
 import es.asgarke.golem.http.types.MediaTypeMapper;
 import es.asgarke.golem.http.types.PlainTextMediaTypeMapper;
 import es.asgarke.golem.tools.ParserTool;
-import es.asgarke.golem.tools.StringOps;
+import es.asgarke.golem.tools.StringValue;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -139,13 +139,13 @@ public class GolemServer {
   private StaticResolver initializeStaticResolver(BeanProperties properties) {
     StaticResolver resolver = new StaticResolver();
     String classpathValues = properties.resolvePropertyTemplate(PROPERTY_STATIC_CP);
-    if (StringOps.isNotEmpty(classpathValues)) {
-      String[] paths = StringOps.splitCommaAndTrim(classpathValues);
+    if (StringValue.isNotEmpty(classpathValues)) {
+      String[] paths = StringValue.splitCommaAndTrim(classpathValues);
       resolver.addClassPathLocations(paths);
     }
     String fileSystemValues = properties.resolvePropertyTemplate(PROPERTY_STATIC_FS);
-    if (StringOps.isNotEmpty(fileSystemValues)) {
-      String[] paths = StringOps.splitCommaAndTrim(fileSystemValues);
+    if (StringValue.isNotEmpty(fileSystemValues)) {
+      String[] paths = StringValue.splitCommaAndTrim(fileSystemValues);
       resolver.addFilePathLocations(paths);
     }
     return resolver;

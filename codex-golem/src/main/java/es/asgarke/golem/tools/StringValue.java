@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class StringOps {
+public class StringValue {
 
   public static boolean isEmpty(String s) {
     return s == null || s.isBlank();

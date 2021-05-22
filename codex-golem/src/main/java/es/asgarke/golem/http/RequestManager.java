@@ -11,7 +11,7 @@ import es.asgarke.golem.http.definitions.*;
 import es.asgarke.golem.http.types.ExceptionMapper;
 import es.asgarke.golem.http.types.MediaTypeMapper;
 import es.asgarke.golem.http.types.Response;
-import es.asgarke.golem.tools.StringOps;
+import es.asgarke.golem.tools.StringValue;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -82,13 +82,13 @@ public class RequestManager implements HttpHandler {
     for (BeanDefinition<?> definition : endpointBeans) {
       Class<?> clazz = definition.getClazz();
       RestResource config = clazz.getAnnotation(RestResource.class);
-      String basePath = StringOps.joinPaths(rootPath, config.path());
+      String basePath = StringValue.joinPaths(rootPath, config.path());
       List<Method> methods = Arrays.stream(clazz.getMethods())
         .filter(m -> m.isAnnotationPresent(Endpoint.class))
         .collect(Collectors.toList());
       for (Method method : methods) {
         Endpoint endpoint = method.getAnnotation(Endpoint.class);
-        String endpointPath = StringOps.joinPaths(basePath, endpoint.path());
+        String endpointPath = StringValue.joinPaths(basePath, endpoint.path());
         String [] segments = endpointPath.substring(1).split("/");
         MappingNode terminal = root;
         for (String segment : segments) {
@@ -125,6 +125,8 @@ public class RequestManager implements HttpHandler {
   public void handle(HttpExchange exchange) throws IOException {
     // create a request context from the exchange?
     Response response = resolveRequest(exchange);
+    // add required headers
+    exchange.getResponseHeaders().putAll(response.getHeaders());
     // resolve the media type
     String mediaType = response.getMediaType();
     if (mediaType != null && !mediaType.isBlank()) {
@@ -246,7 +248,7 @@ public class RequestManager implements HttpHandler {
    * @return the generated value (which might be null).
    */
   private MediaTypeMapper resolveMapperForMediaType(String mediaType) {
-    String effectiveMediaType = StringOps.isEmpty(mediaType) ? MediaType.TEXT_PLAIN : mediaType;
+    String effectiveMediaType = StringValue.isEmpty(mediaType) ? MediaType.TEXT_PLAIN : mediaType;
     return mediaTypeMappers.stream()
       .filter(mapper -> mapper.canMapMediaType(effectiveMediaType))
       .findFirst()

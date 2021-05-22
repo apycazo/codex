@@ -1,7 +1,7 @@
 package es.asgarke.golem.http.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.asgarke.golem.tools.StringOps;
+import es.asgarke.golem.tools.StringValue;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class JsonMediaTypeMapper implements MediaTypeMapper {
 
   @Override
   public boolean canMapMediaType(String mediaType) {
-    if (StringOps.isEmpty(mediaType)) {
+    if (StringValue.isEmpty(mediaType)) {
       return false;
     } else {
       String [] values = mediaType.split("\\s*;\\s*");

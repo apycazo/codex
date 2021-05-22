@@ -1,6 +1,6 @@
 package es.asgarke.golem.demo;
 
-import es.asgarke.golem.tools.StringOps;
+import es.asgarke.golem.tools.StringValue;
 import es.asgarke.golem.types.Pair;
 
 import javax.inject.Singleton;
@@ -36,7 +36,7 @@ public class DataService {
   }
 
   public boolean put(String key, Object value) {
-    if (StringOps.isEmpty(key) || value == null) {
+    if (StringValue.isEmpty(key) || value == null) {
       return false;
     } else {
       store.put(key, value);

@@ -28,6 +28,14 @@ public class DemoEndpoint {
     this.config = config;
   }
 
+  @Endpoint(method = HttpMethod.GET, path = "/ping", produces = MediaType.APPLICATION_JSON)
+  public Response ping() {
+    return Response.ok()
+      .addHeader("x-custom-header", "ping")
+      .addHeader("x-header-list", "value1")
+      .addHeader("x-header-list", "value2");
+  }
+
   @Endpoint(method = HttpMethod.GET, path = "/id", produces = MediaType.APPLICATION_JSON)
   public Map<String, String> getAttribute() {
     return Map.of("id", CurrentRequest.getId());

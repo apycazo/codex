@@ -1,6 +1,6 @@
 package es.asgarke.golem.http.types;
 
-import es.asgarke.golem.tools.StringOps;
+import es.asgarke.golem.tools.StringValue;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -11,7 +11,7 @@ public class BinaryMediaTypeMapper implements MediaTypeMapper {
 
   @Override
   public boolean canMapMediaType(String mediaType) {
-    if (StringOps.isEmpty(mediaType)) {
+    if (StringValue.isEmpty(mediaType)) {
       return false;
     } else {
       String media = mediaType.toLowerCase();

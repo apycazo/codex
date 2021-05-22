@@ -222,7 +222,7 @@ Lower values will get higher priority. Default value is 5000. The recommended le
 ### Limitations and things to notice
 
 - Rest endpoints can not map simple types, only objects (this is, need to use Integer instead of int, for example).
-- The default pool size if fairly small (8), since this is meant to be used for small applications.
+- The default pool size is fairly small (8), since this is meant to be used for small applications.
 
 # Backlog:
 

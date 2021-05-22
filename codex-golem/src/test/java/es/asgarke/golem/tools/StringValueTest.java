@@ -9,20 +9,20 @@ import java.net.URISyntaxException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-class StringOpsTest {
+class StringValueTest {
 
   @Test
   void test_path_join() {
-    assertThat(StringOps.joinPaths()).isEqualTo("");
-    assertThat(StringOps.joinPaths("test", "value")).isEqualTo("/test/value");
-    assertThat(StringOps.joinPaths("/test", "/value")).isEqualTo("/test/value");
-    assertThat(StringOps.joinPaths("/test/", "/value/")).isEqualTo("/test/value");
-    assertThat(StringOps.joinPaths("http://test/", "/value/")).isEqualTo("http://test/value");
+    assertThat(StringValue.joinPaths()).isEqualTo("");
+    assertThat(StringValue.joinPaths("test", "value")).isEqualTo("/test/value");
+    assertThat(StringValue.joinPaths("/test", "/value")).isEqualTo("/test/value");
+    assertThat(StringValue.joinPaths("/test/", "/value/")).isEqualTo("/test/value");
+    assertThat(StringValue.joinPaths("http://test/", "/value/")).isEqualTo("http://test/value");
   }
 
   @Test
   void test_segment_resolver() throws URISyntaxException {
-    String path = StringOps.joinPaths("/api/v2/:id");
+    String path = StringValue.joinPaths("/api/v2/:id");
     String[] segments = path.substring(1).split("/");
     for (String s : segments) {
       log.info("Segment: {}", s);
