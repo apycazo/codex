@@ -6,6 +6,8 @@ dependencies {
   implementation springStarter, logback
   implementation "org.yaml:snakeyaml"
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+  implementation "io.javalin:javalin"
+  implementation "com.squareup.okhttp3:okhttp"
 }
 
 compileKotlin {

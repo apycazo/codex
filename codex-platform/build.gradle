@@ -73,8 +73,8 @@ dependencies {
       "info.picocli:picocli:$picocli",
       "info.picocli:picocli-codegen:$picocli",
       "io.github.openfeign.form:feign-form:$feignFormVersion",
-      "com.github.ben-manes.caffeine:caffeine:$caffeine"
-
+      "com.github.ben-manes.caffeine:caffeine:$caffeine",
+      "com.squareup.okhttp3:okhttp:$okhttp"
     )
   }
 }
