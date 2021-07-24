@@ -2,9 +2,7 @@ package apycazo.codex.java.basic;
 
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.implementation.FixedValue;
-import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.implementation.MethodDelegation;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +10,15 @@ import java.lang.reflect.InvocationTargetException;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
- * Proxy using byte buddy. Thi
+ * Proxy using byte buddy. Only works as defined here when the proxied class
+ * has a no-args constructor. Otherwise the correct constructor must be called,
+ * or a default one must be added to the subclass with something like:
+ * <pre>{@code
+ * builder.defineConstructor(Visibility.PUBLIC)
+ *   .intercept(MethodInvocation.invoke(ClassA.class.getDeclaredConstructor(String.class))
+ *   .onSuper().withArgument("ok"))
+ * }
+ * </pre>
  */
 @Slf4j
 public class ProxyByteBuddy {
@@ -22,16 +28,12 @@ public class ProxyByteBuddy {
     InstantiationException, IllegalAccessException {
 
     // to be used as a delegate
-    Dummy defaultDummy = new Dummy("");
+    Dummy defaultDummy = new Dummy("hola mundo!");
 
     Dummy dummy = new ByteBuddy()
       .subclass(Dummy.class)
-      // dummy has no no-args constructor, so we need to defined one here,
-      // which will call the super class default method constructor.
-      // It seems like using 'Object.class.getDeclaredConstructor()' works too.
-      .defineConstructor(Visibility.PUBLIC)
-      .intercept(MethodCall.invoke(Dummy.class.getSuperclass().getDeclaredConstructor()).onSuper())
-      .method(isDeclaredBy(Dummy.class)).intercept(MethodDelegation.to(defaultDummy))
+      .method(isDeclaredBy(Dummy.class))
+      .intercept(MethodDelegation.to(defaultDummy))
       .method(named("echo"))
       .intercept(FixedValue.value("Echo!"))
       .method(named("echo").and(takesArguments(1)).and(returns(String.class)))
@@ -47,14 +49,22 @@ public class ProxyByteBuddy {
 
   public static class Dummy {
 
-    public Dummy(String s) {}
+    private final String salute;
+
+    public Dummy() {
+      this.salute = "hello world";
+    }
+
+    public Dummy(String salute) {
+      this.salute = salute;
+    }
 
     public String echo(String text) {
       return text;
     }
 
     public String hi() {
-      return "hello world";
+      return salute;
     }
   }
 }
