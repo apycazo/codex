@@ -1,5 +1,6 @@
 plugins {
-  id "io.franzbecker.gradle-lombok" version "3.3.0" apply false
+//  id "io.franzbecker.gradle-lombok" version "3.3.0" apply false
+  id "io.freefair.lombok" version "6.0.0-m2" apply false
 }
 
 subprojects {
@@ -11,7 +12,7 @@ subprojects {
   def ignoredProjects = ["codex-platform", "codex-golem"]
   if (!ignoredProjects.contains(project.name)) {
     apply plugin: "java-library"
-    apply plugin: "io.franzbecker.gradle-lombok"
+    apply plugin: "io.freefair.lombok"
     dependencies {
       implementation platform(project(":codex-platform"))
     }
