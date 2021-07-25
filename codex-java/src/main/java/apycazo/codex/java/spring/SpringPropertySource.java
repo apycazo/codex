@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.PropertiesPropertySource;
-import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
 import org.springframework.stereotype.Service;
@@ -50,10 +50,9 @@ public class SpringPropertySource {
 
   @Configuration
   @Import(SpringService.class)
-  @org.springframework.context.annotation.PropertySource(
-    value = "remote.properties")
-  @org.springframework.context.annotation.PropertySource(
-    value = "${remote.target}", factory = RemotePropertySource.class)
+  @PropertySource(value = "remote.properties")
+  @PropertySource(value = "${remote.target}",
+    factory = RemotePropertySource.class)
   public static class SpringConfig {}
 
   @Service
@@ -96,7 +95,7 @@ public class SpringPropertySource {
 
     @NotNull
     @Override
-    public PropertySource<?> createPropertySource(String name, EncodedResource resource) throws IOException {
+    public PropertiesPropertySource createPropertySource(String name, EncodedResource resource) throws IOException {
       URL url = resource.getResource().getURL();
       log.info("Resource target is {}", url);
       Properties properties = mapper.readValue(url, Properties.class);
