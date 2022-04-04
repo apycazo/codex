@@ -11,6 +11,9 @@ dependencies {
   // --- h2 database
   implementation "com.h2database:h2"
   // --- extras
-  implementation logback + testing
+  implementation(libs.bundles.logback)
+  implementation(libs.bundles.testing)
+//  logback.forEach { v -> implementation(v) }
+//  testing.forEach { v -> implementation(v) }
   testImplementation "org.springframework:spring-test"
 }

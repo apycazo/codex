@@ -1,5 +1,5 @@
 dependencies {
-  implementation logback
+  implementation libs.bundles.logback
   implementation "io.github.openfeign:feign-core"
   implementation "io.github.openfeign:feign-slf4j"
   implementation "io.github.openfeign:feign-jackson"

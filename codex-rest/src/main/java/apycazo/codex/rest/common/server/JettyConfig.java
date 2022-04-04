@@ -143,6 +143,8 @@ public class JettyConfig {
     servletContextHandler.addEventListener(new ContextLoaderListener(springContext));
     // --- add servlet gateway filter
     servletContextHandler.addFilter(ServletGatewayFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+    // --- add spring context filter (allows usage of thread binding) (import the spring package)
+    // servletContextHandler.addFilter(RequestContextFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
     return servletContextHandler;
   }
 }

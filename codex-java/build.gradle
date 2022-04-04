@@ -3,11 +3,15 @@ plugins {
 }
 
 dependencies {
-  implementation springStarter, logback
+  implementation libs.bundles.logback
+  implementation libs.jackson
+  implementation libs.springContext
+  implementation libs.javaAnnotations
   implementation "org.yaml:snakeyaml"
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
   implementation "io.javalin:javalin"
   implementation "com.squareup.okhttp3:okhttp"
+  testImplementation libs.bundles.testing
 }
 
 compileKotlin {

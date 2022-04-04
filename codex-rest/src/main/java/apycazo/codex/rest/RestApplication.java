@@ -52,6 +52,7 @@ public class RestApplication {
     ResourceConfig resourceConfig = new ResourceConfig();
     resourceConfig.packages(baseScanPath);
     // binds http requests to service threads (Important! use the jersey class, not the spring one)
+    // the spring class should be registered in the JettyConfig class.
     resourceConfig.register(RequestContextFilter.class);
     // jersey implementation of resource context
     resourceConfig.register(JerseyResourceContext.class);

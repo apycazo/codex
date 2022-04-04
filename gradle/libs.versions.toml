@@ -1,0 +1,24 @@
+# ==================================================================================================================== #
+[libraries]
+jackson = "com.fasterxml.jackson.core:jackson-databind:+"
+slf4jApi = "org.slf4j:slf4j-api:+"
+logbackCore = "ch.qos.logback:logback-core:+"
+logbackClassic = "ch.qos.logback:logback-classic:+"
+springContext = "org.springframework:spring-context:+"
+javaAnnotations = "javax.annotation:javax.annotation-api:+"
+jupiter = "org.junit.jupiter:junit-jupiter:+"
+platformRunner = "org.junit.platform:junit-platform-runner:+"
+assertjCore = "org.assertj:assertj-core:+"
+cucumberJava = "io.cucumber:cucumber-java:+"
+cucumberJunit = "io.cucumber:cucumber-junit:+"
+cucumberSpring = "io.cucumber:cucumber-spring:+"
+restAssured = "io.rest-assured:rest-assured:+"
+springTest = "org.springframework:spring-test:+"
+# ==================================================================================================================== #
+[bundles]
+logback = ["slf4jApi", "logbackCore", "logbackClassic"]
+testing = ["jupiter", "platformRunner", "assertjCore", "cucumberJava", "cucumberJunit",
+  "cucumberSpring", "restAssured", "springTest", "assertjCore"
+]
+# ==================================================================================================================== #
+

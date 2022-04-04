@@ -15,4 +15,6 @@ include 'codex-testing'
 include 'codex-golem'
 include 'codex-jetty'
 include 'codex-rest'
+include 'codex-catalog'
+include 'codex-catalogclient'
 

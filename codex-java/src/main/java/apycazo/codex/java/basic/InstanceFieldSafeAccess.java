@@ -9,26 +9,28 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Shows how a safe access operator can be imitated using java 8 Optional methods.
  */
 @Slf4j
 public class InstanceFieldSafeAccess {
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     log.info(">> Safe accessor example <<");
     Element subject = Element.builder().id("a").build();
     String fallbackValue = "z";
     String value = Optional.ofNullable(subject.getElement()).map(Element::getId).orElse(fallbackValue);
     log.info("Value defaulted to '{}'", value);
-    assertThat(value).isEqualTo(fallbackValue);
+    if (!fallbackValue.equals(value)) {
+      throw new Exception(String.format("Expected '%s', got '%s'", fallbackValue, value));
+    }
     String expectedValue = "b";
     subject.setElement(Element.builder().id(expectedValue).build());
     value = Optional.ofNullable(subject.getElement()).map(Element::getId).orElse(fallbackValue);
     log.info("Value is now '{}'", value);
-    assertThat(value).isEqualTo(expectedValue);
+    if (!expectedValue.equals(value)) {
+      throw new Exception(String.format("Expected '%s', got '%s'", expectedValue, value));
+    }
   }
 
   @Data

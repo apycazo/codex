@@ -1,6 +1,6 @@
 dependencies {
   // generic
-  implementation logback
+  implementation libs.bundles.logback
   // spring services
   implementation "org.springframework:spring-context"
   // rest service

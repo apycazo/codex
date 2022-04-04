@@ -1,7 +1,7 @@
 plugins {
-  id "org.asciidoctor.convert" version "1.5.9.2"
+  id "org.asciidoctor.jvm.convert" version "3.3.2"
   // configuring shadow: https://imperceptiblethoughts.com/shadow/configuration/
-  id "com.github.johnrengelman.shadow" version "6.1.0"
+  id "com.github.johnrengelman.shadow" version "7.1.2"
   id "application"
   id "java-library"
 }

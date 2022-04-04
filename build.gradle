@@ -8,7 +8,7 @@ subprojects {
     mavenCentral()
   }
   // --- configure projects
-  def ignoredProjects = ["codex-platform", "codex-golem"]
+  def ignoredProjects = ["codex-platform", "codex-golem", "codex-catalog"]
   if (!ignoredProjects.contains(project.name)) {
     apply plugin: "java-library"
     apply plugin: "io.franzbecker.gradle-lombok"
@@ -18,32 +18,3 @@ subprojects {
   }
 }
 
-// starters
-ext {
-  testing = [
-    "org.junit.jupiter:junit-jupiter",
-    "org.junit.platform:junit-platform-runner",
-    "org.assertj:assertj-core",
-    "io.cucumber:cucumber-java",
-    "io.cucumber:cucumber-junit",
-    "io.cucumber:cucumber-spring",
-    "io.rest-assured:rest-assured"
-  ]
-
-  logback = [
-    "org.slf4j:slf4j-api",
-    "ch.qos.logback:logback-core",
-    "ch.qos.logback:logback-classic"
-  ]
-
-  springBasic = [
-    "org.springframework:spring-context",
-    "org.springframework:spring-test"
-  ]
-
-  jackson = [
-    "com.fasterxml.jackson.core:jackson-databind"
-  ]
-
-  springStarter = testing + logback + jackson + springBasic + ["javax.annotation:javax.annotation-api"]
-}
