@@ -10,6 +10,7 @@ catalog {
     library("jacksonDatabind", "com.fasterxml.jackson.core:jackson-databind:2.13.2.20220324")
     library("slf4jApi", "org.slf4j:slf4j-api:1.7.25")
     library("slf4jSimple", "org.slf4j:slf4j-simple:1.7.25")
+    bundle("slf4j", ["slf4jApi", "slf4jSimple"])
   }
 }
 
@@ -23,24 +24,39 @@ publishing {
 
 // This catalog can be imported in the settings.gradle file with:
 // --------------------------------------------
-//dependencyResolutionManagement {
-//  repositories {
-//    mavenLocal()
-//  }
-//  versionCatalogs {
-//    libs {
-//      from("apycazo.codex:codex-catalog:1.0.0-SNAPSHOT")
-//    }
-//  }
-//}
+/*
+  dependencyResolutionManagement {
+    repositories {
+      mavenLocal()
+    }
+    versionCatalogs {
+      libs {
+        from("apycazo.codex:codex-catalog:1.0.0-SNAPSHOT")
+      }
+    }
+  }
+*/
+
 // --------------------------------------------
 // And then use it in the build.gradle like:
-//dependencies {
-//  implementation libs.javalin
-//  implementation libs.jacksonDatabind
-//  implementation libs.slf4jApi
-//  implementation libs.slf4jSimple
-//}
+/*
+dependencies {
+  implementation libs.javalin
+  implementation libs.jacksonDatabind
+  implementation libs.slf4jApi
+  implementation libs.slf4jSimple
+}
+ */
+
+// or like this:
+/*
+dependencies {
+  implementation libs.javalin
+  implementation libs.jacksonDatabind
+  implementation libs.bundles.slf4j
+}
+*/
+
 
 
 

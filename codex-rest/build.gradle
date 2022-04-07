@@ -23,8 +23,10 @@ dependencies {
   testImplementation "org.junit.platform:junit-platform-runner"
   testImplementation "org.assertj:assertj-core"
   testImplementation "io.cucumber:cucumber-java"
+  testImplementation "io.cucumber:cucumber-spring"
   testImplementation "io.cucumber:cucumber-junit" // required to use cucumber with junit
   testImplementation "io.rest-assured:rest-assured"
+  testImplementation "org.springframework:spring-test"
 }
 
 asciidoctor {

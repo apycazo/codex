@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Slf4j
 @RunWith(JUnitPlatform.class)
-public class VanillaParameterizedTest {
+class VanillaParameterizedTest {
 
   private static final VanillaService service = new VanillaService();
 
