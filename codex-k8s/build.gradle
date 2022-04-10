@@ -1,0 +1,32 @@
+plugins {
+  id 'java'
+  id 'application'
+  id 'maven-publish'
+}
+
+repositories {
+  mavenCentral()
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+  }
+}
+
+application {
+  mainClassName = "apycazo.codex.k8s.PropertyServer"
+}
+
+dependencies {
+  implementation "io.javalin:javalin"
+  implementation "com.fasterxml.jackson.core:jackson-databind"
+  implementation "org.slf4j:slf4j-api"
+  implementation "ch.qos.logback:logback-classic"
+  implementation "org.hibernate:hibernate-core"
+  implementation "mysql:mysql-connector-java"
+}
+
+test {
+  useJUnitPlatform()
+}

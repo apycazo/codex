@@ -17,4 +17,5 @@ include 'codex-jetty'
 include 'codex-rest'
 include 'codex-catalog'
 include 'codex-catalogclient'
+include 'codex-k8s'
 

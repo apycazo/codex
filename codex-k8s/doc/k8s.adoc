@@ -1,0 +1,282 @@
+= K8S
+
+== Check cluster status
+
+- *Status*: `minikube status`
+- *Start*: `minikube start`
+- *Stop*: `minikube stop`
+- *Check context*: `kubectl config current-context`.
+- *List contexts*: `kubectl config get-contexts`.
+- *Switch context*: `kubectl config use-context context-name`
+- *Get namespace*: `kubectl get namespaces`
+- *Switch namespace*: `kubectl config set-context --current --namespace=your-namespace`
+- *Get pods*: `kubectl get pods`
+
+== Kubernetes main component types
+
+- *Pod*: Contains the running application containers, plus auxiliaries.
+- *Service*: Defines a set of pods, and how to access them. Can be internal
+(ClusterIP) or external (LoadBalancer).
+- *Config maps*: Define regular pod configurations.
+- *Secrets*: Define sensitive properties, like passwords.
+
+
+== Definitions
+
+- *Kubernetes context*: Set of access parameters, including user, password and
+namespace.
+- *Kubernetes namespace*: Virtual cluster. Multiple virtual clusters can be
+backed up by the same physical one.
+
+
+== Management
+
+Create a new context:
+
+
+
+== Full sample
+
+This example is taken from link:https://www.youtube.com/watch?v=X48VuDVv0do&t=6s&ab_channel=TechWorldwithNana[Kubernetes Tutorial for Beginners]
+The repository link:https://gitlab.com/nanuchi/youtube-tutorial-series/-/tree/master/demo-kubernetes-components[link].
+
+This installs a mongodb database plus a mongo-express service. The basic
+structure for this:
+
+[ditaa]
+....
++-----------------+
+| Web page        |
+| (mongo-express) |
++-----------------+
+        |
+        v
++------------------+       /-------------------\
+| Mongo express    |------>| Mongo express Pod |
+| External service |       |                   |
++------------------+       \-------------------/
+                                |
+                                v
+/--------------\       +-------------------+
+| Mongo DB Pod |<------| Mongo DB Pod      |
+|              |       | Internal service  |
+\--------------/       +-------------------+
+....
+
+==== Create the MongoBD deployment
+
+In this config file we create the pod for the MongoDB container, and the
+internal service for the pod.
+
+.mongo.yaml
+[source,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME // <1>
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-username
+        - name: MONGO_INITDB_ROOT_PASSWORD // <1>
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service // <2>
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+----
+<1> These values will be taken from the secret config.
+<2> This value will be used in the config map for the url mapping.
+
+We add a config map with the mapping
+
+.mongo-configmap.yaml
+[source,yaml]
+----
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-configmap
+data:
+  database_url: mongodb-service
+----
+
+Now we need to configure the secrets
+
+.mongo-secret.yaml
+[source,yaml]
+----
+apiVersion: v1
+kind: Secret // <1>
+metadata:
+  name: mongodb-secret
+type: Opaque // <2>
+data:
+  mongo-root-username: dXNlcm5hbWU=
+  mongo-root-password: cGFzc3dvcmQ=
+----
+<1> This is a secret configuration file.
+<2> This is default for key-value pairs.
+
+*Result*: We now have configured the Mongo DB pod, exposed internally to other
+k8s pods, and defined the credentials to use.
+
+==== Create the Mongo Express deployment
+
+We can use the properties already defined in the previous step to connect to
+the MongoDB pod, so we only need to define here the pod itself, and the service
+it will use.
+
+Notice that in this case, the service used is an external one.
+
+.mongo-express.yaml
+[source,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  labels:
+    app: mongo-express
+spec:
+  replicas: 1 // <1>
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express // <2>
+        image: mongo-express
+        ports:
+        - containerPort: 8081
+        env:
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-username
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-password
+        - name: ME_CONFIG_MONGODB_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-configmap // <3>
+              key: database_url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  type: LoadBalancer // <4>
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 30000
+----
+<1> We only want one replica, but could be more.
+<2> This describes the container to use, and sets the configuration.
+<3> We will use the same config map we already defined for mongodb.
+<4> This service is external, which are named 'LoadBalancer'.
+
+==== Create an ingress to access
+
+Now we need to create an ingress config to manage external access.
+
+.ingress.yaml
+[source,yaml]
+----
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: name
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: app.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: my-service
+              servicePort: 8080
+
+----
+
+==== Applying configurations
+
+.kubectl apply commands in order
+[source]
+----
+kubectl apply -f mongo-secret.yaml
+kubectl apply -f mongo.yaml
+kubectl apply -f mongo-configmap.yaml
+kubectl apply -f mongo-express.yaml
+----
+
+.kubectl get commands
+[source]
+----
+kubectl get pod
+kubectl get pod --watch
+kubectl get pod -o wide
+kubectl get service
+kubectl get secret
+kubectl get all | grep mongodb
+----
+
+.kubectl debugging commands
+[source]
+----
+kubectl describe pod mongodb-deployment-xxxxxx
+kubectl describe service mongodb-service
+kubectl logs mongo-express-xxxxxx
+----
+
+.give a URL to external service in minikube
+[source]
+----
+minikube service mongo-express-service
+----
