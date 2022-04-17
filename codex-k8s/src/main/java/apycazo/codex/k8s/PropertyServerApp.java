@@ -1,5 +1,6 @@
 package apycazo.codex.k8s;
 
+import apycazo.codex.k8s.api.RestController;
 import apycazo.codex.k8s.config.ServiceProperties;
 import apycazo.codex.k8s.data.DataService;
 import apycazo.codex.k8s.data.InMemoryDataService;
@@ -12,10 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
-public class PropertyServer {
+public class PropertyServerApp {
 
   private static final Logger log =
-    LoggerFactory.getLogger(PropertyServer.class);
+    LoggerFactory.getLogger(PropertyServerApp.class);
   private static final String APP_CFG = "app_cfg";
 
   public static void main(String[] args) {
@@ -24,9 +25,10 @@ public class PropertyServer {
     );
     log.info("Creating service with properties:\n{}", properties);
     DataService dataService = resolveDataService(properties);
+    log.info("Resolved data service class '{}'", dataService.getClass());
     Javalin
-      .create(PropertyServer::config)
-      .routes(routes(dataService))
+      .create(PropertyServerApp::config)
+      .routes(RestController.configureMapping(dataService))
       .start(properties.getPort());
   }
 
@@ -37,22 +39,6 @@ public class PropertyServer {
     } else {
       return new InMemoryDataService();
     }
-  }
-
-  public static EndpointGroup routes(DataService dataService) {
-    RestController restController = new RestController(dataService);
-    return () -> path("api", () ->
-    {
-      get(restController::info);
-      delete(restController::delete);
-      path("count", () -> get(restController::count));
-      path(":key", () -> {
-        get(restController::getById);
-        delete(restController::deleteKey);
-        put(restController::updateKey);
-        post(restController::save);
-      });
-    });
   }
 
   private static void config(JavalinConfig config) {

@@ -20,13 +20,20 @@ public class ServiceProperties {
   private final String dbuser;
   private final String dbpass;
   private final int port;
+  private final Properties hibernateProperties;
 
   public ServiceProperties(String filePath, String[] args) {
     Properties properties = null;
+    hibernateProperties = new Properties();
     if (filePath != null && !filePath.isEmpty()) {
       try (InputStream input = new FileInputStream(filePath)) {
         properties = new Properties();
         properties.load(input);
+        for (String property : properties.stringPropertyNames()) {
+          if (property.startsWith("hibernate.")) {
+            hibernateProperties.put(property, properties.getProperty(property));
+          }
+        }
       } catch (IOException ex) {
         log.error("Failed to read properties from file '{}'", filePath);
       }
@@ -50,6 +57,12 @@ public class ServiceProperties {
       dbuser = map.getOrDefault("dbuser", "root");
       dbpass = map.getOrDefault("dbpass", "");
       port = Integer.parseInt(map.getOrDefault("port", "8080"));
+      // map any hibernate properties found
+      for (Map.Entry<String, String> entry : map.entrySet()) {
+        if (entry.getKey().startsWith("hibernate.")) {
+          hibernateProperties.put(entry.getKey(), entry.getValue());
+        }
+      }
     }
   }
 
@@ -92,9 +105,12 @@ public class ServiceProperties {
     return port;
   }
 
+  public Properties getHibernateProperties() {
+    return hibernateProperties;
+  }
+
   @Override
   public String toString() {
-    return String.format("dbhost: %s%ndbuser:%s%ndbpass:%s%nport:%d%n",
-      dbhost, dbuser, dbpass, port);
+    return String.format("dbhost: %s, dbuser: %s, dbpass: %s, port: %d", dbhost, dbuser, dbpass, port);
   }
 }

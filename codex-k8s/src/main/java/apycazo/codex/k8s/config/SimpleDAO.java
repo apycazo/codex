@@ -1,6 +1,6 @@
 package apycazo.codex.k8s.config;
 
-import apycazo.codex.k8s.data.DbError;
+import apycazo.codex.k8s.others.DbError;
 import apycazo.codex.k8s.data.EntryEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -9,6 +9,7 @@ import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SimpleDAO {
@@ -20,14 +21,17 @@ public class SimpleDAO {
   public SimpleDAO(ServiceProperties props) {
     HibernateConfigurer hibernate = new HibernateConfigurer();
     Configuration configuration = hibernate.configuration(
-      props.getDbhost(), props.getDbuser(), props.getDbpass()
+      props.getDbhost(), props.getDbuser(), props.getDbpass(), props.getHibernateProperties()
     );
     configuration.addAnnotatedClass(EntryEntity.class);
     sessionFactory = hibernate.sessionFactory(configuration);
   }
 
-  protected SessionFactory sessionFactory() {
-    return sessionFactory;
+  public void transactionalOperation(Consumer<Session> op) {
+    transaction(session -> {
+      op.accept(session);
+      return null;
+    });
   }
 
   public <T> T transaction(Function<Session, T> op) {
@@ -39,8 +43,8 @@ public class SimpleDAO {
       return result;
     } catch (Exception e) {
       if (transaction != null) {
+        log.error("Operation failed, rolling back", e);
         transaction.rollback();
-        log.error("Operation failed, rolled back", e);
       } else {
         log.error("Operation failed", e);
       }

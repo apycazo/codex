@@ -13,10 +13,10 @@ import javax.persistence.*;
 @Table(name = "entry")
 public class EntryEntity {
 
-  @Id
-  @Column(name = "key", unique = true)
+  @Id // note that 'key' is a reserved word
+  @Column(name = "k", unique = true, length = 100)
   private String key;
 
-  @Column(name = "value")
+  @Column(name = "v")
   private String value;
 }

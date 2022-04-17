@@ -2,8 +2,8 @@ package apycazo.codex.k8s.data;
 
 import apycazo.codex.k8s.config.ServiceProperties;
 import apycazo.codex.k8s.config.SimpleDAO;
-import org.hibernate.query.Query;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,56 +15,57 @@ public class MysqlDataService extends SimpleDAO implements DataService {
 
   @Override
   public String getByKey(String key) {
-    String statement = "select EntryEntity from EntryEntity where key=:key";
     return query(session ->
-      session.createQuery(
-        statement, EntryEntity.class
-      ).uniqueResult().getValue()
+      session
+        .createQuery("from EntryEntity x where x.key=:key", EntryEntity.class)
+        .setParameter("key", key)
+        .uniqueResult()
+        .getValue()
     );
   }
 
   @Override
   public void saveOrUpdate(String key, String value) {
     EntryEntity entity = new EntryEntity(key, value);
-    transaction(session -> session.save(entity));
+    transactionalOperation(session -> session.saveOrUpdate(entity));
   }
 
   @Override
   public void deleteKey(String key) {
-    transaction(session -> {
-      String query = "delete from EntryEntity where key=:key";
-      Query<?> sqlQuery = session.createQuery(query);
-      sqlQuery.setParameter("key", key);
-      session.createQuery(query).executeUpdate();
-      return "";
-    });
+    transactionalOperation(session ->
+      session
+        .createQuery("delete from EntryEntity x where x.key=:key")
+        .setParameter("key", key)
+        .executeUpdate()
+    );
   }
 
   @Override
   public Set<String> getKeys() {
-    return null;
+    return new HashSet<>(transaction(session ->
+      session.createQuery("select x.key from EntryEntity x", String.class).list()
+    ));
   }
 
   @Override
   public List<String> getValues() {
-    return null;
+    return transaction(session ->
+      session.createQuery("select x.value from EntryEntity x", String.class).list()
+    );
   }
 
   @Override
   public long getCount() {
     return transaction(session -> {
-      String query = "select count(*) from EntryEntity";
-      return (Long)session.createQuery(query).uniqueResult();
+      return (Long)session.createQuery("select count(*) from EntryEntity").uniqueResult();
     });
   }
 
   @Override
   public void delete() {
-    transaction(session -> {
-      String query = "delete from EntryEntity";
-      session.createQuery(query).executeUpdate();
-      return "";
-    });
+    transactionalOperation(session ->
+      session.createQuery("delete from EntryEntity").executeUpdate()
+    );
   }
 
   @Override

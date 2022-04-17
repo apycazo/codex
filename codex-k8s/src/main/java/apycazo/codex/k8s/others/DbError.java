@@ -1,4 +1,4 @@
-package apycazo.codex.k8s.data;
+package apycazo.codex.k8s.others;
 
 public class DbError extends RuntimeException {
 

@@ -19,6 +19,7 @@ This is a reference code library for multiple libraries, see the contents below.
 + **codex-platform**: project-wide gradle platform (BOM) for dependency management.
 + **codex-rest**: rest service implementation.
 + **codex-testing**: code testing examples.
++ **codex-k8s**: kubernetes documentation and sample app for testing.
 
 ## Reference platforms
 
