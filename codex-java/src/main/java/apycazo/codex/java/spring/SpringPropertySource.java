@@ -51,8 +51,7 @@ public class SpringPropertySource {
   @Configuration
   @Import(SpringService.class)
   @PropertySource(value = "remote.properties")
-  @PropertySource(value = "${remote.target}",
-    factory = RemotePropertySource.class)
+  @PropertySource(value = "${remote.target}", factory = RemotePropertySource.class)
   public static class SpringConfig {}
 
   @Service
@@ -86,7 +85,7 @@ public class SpringPropertySource {
   }
 
   /**
-   * This class implements the actual property resolver. The resource received (expected but not tested to be an URL)
+   * This class implements the actual property resolver. The resource received (expected but not tested to be a URL)
    * will be resolved and mapper with an ObjectMapper instance and used to return a property source.
    */
   public static class RemotePropertySource implements PropertySourceFactory {

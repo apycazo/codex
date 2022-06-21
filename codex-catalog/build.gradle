@@ -4,14 +4,17 @@ plugins {
 }
 
 catalog {
-  // declare the aliases, bundles and versions in this block
   versionCatalog {
-    library("javalin", "io.javalin:javalin:3.8.0")
-    library("jacksonDatabind", "com.fasterxml.jackson.core:jackson-databind:2.13.2.20220324")
-    library("slf4jApi", "org.slf4j:slf4j-api:1.7.25")
-    library("slf4jSimple", "org.slf4j:slf4j-simple:1.7.25")
-    bundle("slf4j", ["slf4jApi", "slf4jSimple"])
+    from(files("../gradle/libs.versions.toml"))
   }
+  // declare the aliases, bundles and versions in this block
+//  versionCatalog {
+//    library("javalin", "io.javalin:javalin:3.8.0")
+//    library("jacksonDatabind", "com.fasterxml.jackson.core:jackson-databind:2.13.2.20220324")
+//    library("slf4jApi", "org.slf4j:slf4j-api:1.7.25")
+//    library("slf4jSimple", "org.slf4j:slf4j-simple:1.7.25")
+//    bundle("slf4j", ["slf4jApi", "slf4jSimple"])
+//  }
 }
 
 publishing {
