@@ -15,6 +15,11 @@ subprojects {
     dependencies {
       implementation platform(project(":codex-platform"))
     }
+    java {
+      toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+      }
+    }
   }
 }
 
