@@ -56,6 +56,8 @@ public class ApplicationSettings {
   private String keyStorePath;
   @Value("${features.ssl.keystore.pass:}")
   private String keyStorePass;
+  @Value("${features.ssl.required:false}")
+  private boolean sslRequired;
 
   private final Map<String, Object> jettyProperties;
 

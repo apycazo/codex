@@ -1,7 +1,7 @@
 # Codex-Rest
 
-This is a sample rest service to be used as a feature demo. Obviously APIs do not required everything here, but should 
-work as a demo.
+This is a sample rest service to be used as a feature demo. Obviously APIs do not require everything here, but should 
+work as a demo/reference.
 
 ## Servlets
 
@@ -29,11 +29,35 @@ There is a master user password that can be used to authenticate using basic aut
 
 TODO: Store password cyphered (or at least encoded).
 
+### Check client SSL certificate
+
+When the property `features.ssl.required` is set to `true`, the clients sending requests to the service needs to provide
+a certificate registered in the keystore. 
+
+Check the lines:
+
+```
+SslContextFactory.Server sslServer = new SslContextFactory.Server();
+sslServer.setNeedClientAuth(appSettings.isSslRequired());
+```
+
 ## Test certificate
 
-Generated as `keytool -keystore dummy.jks -genkey -keyalg RSA -alias dummy-cert` with pwd: `secret007`.
+Generated as `keytool -keystore dummy.jks -genkey -keyalg RSA -alias dummy-cert -validity 3650` with pwd: `secret007`.
 
 _Note: Using `-keyalg RSA` is important, since it is the standard required._
+
+For clients, extract the key and crt with:
+
+`keytool -importkeystore -srckeystore dummy.jks -destkeystore dummy.p12 -deststoretype PKCS12`
+
+For apache ssl certificate file you need certificate only:
+
+`openssl pkcs12 -in dummy.p12 -nokeys -out dummy.crt`
+
+For ssl key file you need only keys:
+
+`openssl pkcs12 -in dummy.p12 -nocerts -nodes -out dummy.key`
 
 To test SSL, include the VM options: `-Djavax.net.debug=ssl,handshake`. Including into the logger the config for
 jetty also helps:

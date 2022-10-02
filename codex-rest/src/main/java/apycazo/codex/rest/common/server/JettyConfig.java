@@ -87,6 +87,7 @@ public class JettyConfig {
       HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
       httpsConfig.addCustomizer(new SecureRequestCustomizer());
       SslContextFactory.Server sslServer = new SslContextFactory.Server();
+      sslServer.setNeedClientAuth(appSettings.isSslRequired());
       String certLocation = appSettings.getKeyStorePath();
       Resource sslCertResource;
       try {
@@ -106,7 +107,6 @@ public class JettyConfig {
         new SslConnectionFactory(sslServer, "http/1.1"),
         new HttpConnectionFactory(httpsConfig));
       httpsConnector.setPort(appSettings.getServerHttpsPort());
-      httpsConnector.setStopTimeout(5_000);
       server.addConnector(httpsConnector);
     }
   }
