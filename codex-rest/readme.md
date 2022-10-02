@@ -65,6 +65,60 @@ jetty also helps:
 <logger name="org.eclipse.jetty.server.HttpConnection" level="debug"/>
 ```
 
+## Root, server and client certificates
+
+We will generate a root certificate, and then two others, signed with the root, to test SSL requirements over a client.
+
+**NOTE**: When asked for the 'key' file, use the generated 'pem' file. In any case, we have used the same password for
+everything, `secret007`, but this is not required.
+
+First, create the root certificate, in the `resources/certificates/root` directory, run:
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout root.pem -out root.crt -days 3650 -passout pass:"secret007" -subj "/C=ES/ST=Madrid/O=Development/CN=localhost"
+openssl pkcs12 -export -out root.p12 -inkey root.pem -in root.crt -password pass:"secret007"
+```
+
+Now, let's create the server and client certificates (CSR) and sign them with the root. In the 
+`resources/certificates/server` run:
+
+```bash
+# Creates the CSR (request)
+openssl req -new -newkey rsa:4096 -out server.csr -keyout server.pem -subj "/C=ES/ST=Madrid/O=Development/CN=localhost"
+# Create the certificate, from the csr request, and the root CA
+openssl x509 -req -in server.csr -CA ../root/root.crt -CAkey ../root/root.pem -CAcreateserial -out server.crt -days 3650 -sha256
+# Create the p12 file from the certificate and key
+openssl pkcs12 -export -out server.p12 -inkey server.pem -in server.crt -password pass:"secret007"
+```
+
+And this at `resources/certificates/client`:
+
+```bash
+```bash
+# Creates the CSR (request)
+openssl req -new -newkey rsa:4096 -out client.csr -keyout client.pem -subj "/C=ES/ST=Madrid/O=Development/CN=localhost"
+# Create the certificate, from the csr request, and the root CA
+openssl x509 -req -in client.csr -CA ../root/root.crt -CAkey ../root/root.pem -CAcreateserial -out client.crt -days 3650 -sha256
+# Create the p12 file from the certificate and key
+openssl pkcs12 -export -out client.p12 -inkey client.pem -in client.crt -password pass:"secret007"
+```
+
+Now, to test, configure the service to use the `server.p12` keystore:
+
+```properties
+features.ssl.keystore.path = classpath:certificates/server/server.p12
+features.ssl.keystore.pass = secret007
+```
+
+Also include the config to demand a valid certificate:
+
+```properties
+features.ssl.required = true
+```
+
+And try using the client values on the client (like postman) to check that it is accepted. Notice that postman does not
+require the p12 file, click on `settings -> add certificate` and provide the crt, pem and password.
+
 ## Persistence 
 
 TODO
